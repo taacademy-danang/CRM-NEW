@@ -45,8 +45,9 @@ export default function AiSituationsPage() {
               { label: "Thư viện tình huống" },
             ]}
           />
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Thư Viện Tình Huống Thực Tế Đã Phê Duyệt
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <Layers className="w-6 h-6 text-[#DC2626]" />
+            <span>Thư Viện Tình Huống Thực Tế Đã Phê Duyệt</span>
           </h1>
           <p className="text-xs text-slate-500">
             Tập hợp các câu hỏi hóc búa, lời từ chối của phụ huynh kèm câu trả lời mẫu mực và lỗi tối kỵ cần tránh.
@@ -55,7 +56,7 @@ export default function AiSituationsPage() {
 
         <button
           type="button"
-          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#8B1D2C] hover:bg-[#721422] rounded-xl shadow-md transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-colors"
         >
           <Plus className="w-4 h-4" />
           Thêm Tình Huống Mới
@@ -78,13 +79,13 @@ export default function AiSituationsPage() {
             </div>
 
             <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <BookCheck className="w-4 h-4 text-[#8B1D2C] shrink-0" />
+              <BookCheck className="w-4 h-4 text-[#DC2626] shrink-0" />
               <span>{sit.title}</span>
             </h3>
 
             {/* Ideal response */}
-            <div className="p-3.5 bg-rose-50/50 border border-rose-100 rounded-xl">
-              <span className="text-[11px] font-bold text-[#8B1D2C] uppercase tracking-wider block mb-1">
+            <div className="p-3.5 bg-red-50/50 border border-red-100 rounded-xl">
+              <span className="text-[11px] font-bold text-[#DC2626] uppercase tracking-wider block mb-1">
                 Câu trả lời chuẩn mẫu (Ideal Response):
               </span>
               <p className="text-xs text-slate-800 leading-relaxed italic">

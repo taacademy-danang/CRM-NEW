@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import { PlayCircle, Send, Sparkles, RefreshCw, Bot, User, BookOpen } from "lucide-react";
+import { PlayCircle, Send, Sparkles, RefreshCw, Bot, User } from "lucide-react";
 
 export default function AiPlaygroundPage() {
   const [scenario, setScenario] = useState("SCENARIO_MODEL_KIDS");
@@ -46,11 +46,12 @@ export default function AiPlaygroundPage() {
             { label: "Phòng thực hành AI (Playground)" },
           ]}
         />
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-          Phòng Thực Hành AI (Interactive Playground)
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <PlayCircle className="w-6 h-6 text-[#DC2626]" />
+          <span>Phòng Thực Hành AI (Interactive Playground)</span>
         </h1>
         <p className="text-xs text-slate-500">
-          Môi trường mô phỏng: Quản trị viên đóng vai Phụ huynh để kiểm thử phản xạ và kiểm tra câu trả lời của AI trước khi đưa vào sản xuất.
+          Môi trường mô phỏng: Đóng vai Phụ huynh để kiểm thử phản xạ và kiểm tra câu trả lời của AI trước khi đưa vào sản xuất.
         </p>
       </div>
 
@@ -102,7 +103,6 @@ export default function AiPlaygroundPage() {
 
       {/* Chat Simulation Area */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[460px]">
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/60">
           {messages.map((m, idx) => (
             <div
@@ -117,15 +117,15 @@ export default function AiPlaygroundPage() {
                     </>
                   ) : (
                     <>
-                      <Bot className="w-3 h-3 text-[#8B1D2C]" /> Trợ lý AI T.A Academy
+                      <Bot className="w-3 h-3 text-[#DC2626]" /> Trợ lý AI T.A Academy
                     </>
                   )}
                 </div>
                 <div
                   className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-xs ${
                     m.role === "user"
-                      ? "bg-slate-800 text-white rounded-br-xs"
-                      : "bg-[#8B1D2C] text-white rounded-bl-xs border border-[#D4AF37]/30"
+                      ? "bg-slate-900 text-white rounded-br-xs font-medium"
+                      : "bg-[#DC2626] text-white rounded-bl-xs font-medium"
                   }`}
                 >
                   {m.text}
@@ -137,25 +137,24 @@ export default function AiPlaygroundPage() {
           {isTyping && (
             <div className="flex justify-start">
               <div className="p-3 bg-white border border-slate-200 rounded-2xl text-xs text-slate-500 italic flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#8B1D2C] animate-spin" />
+                <Sparkles className="w-3.5 h-3.5 text-[#DC2626] animate-spin" />
                 AI đang suy nghĩ và truy xuất kho kiến thức RAG...
               </div>
             </div>
           )}
         </div>
 
-        {/* Input */}
         <form onSubmit={handleSend} className="p-3 bg-white border-t border-slate-200 flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Nhập câu hỏi thử thách AI (Ví dụ: 'Bé nhà chị 6 tuổi hơi gù lưng học lớp nào?', 'Học phí bao nhiêu?')..."
-            className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#8B1D2C]/20"
+            placeholder="Nhập câu hỏi thử thách AI (Ví dụ: 'Bé nhà chị 7 tuổi hơi nhút nhát học lớp nào?', 'Học phí bao nhiêu?')..."
+            className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20"
           />
           <button
             type="submit"
-            className="px-5 py-2.5 bg-[#8B1D2C] hover:bg-[#721422] text-white rounded-xl text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
+            className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
           >
             <Send className="w-3.5 h-3.5" /> Gửi
           </button>

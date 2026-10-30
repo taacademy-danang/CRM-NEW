@@ -32,14 +32,13 @@ export default function CallLogModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!summary.trim()) {
-      setError("Vui lòng nhập tóm tắt nội dung cuộc gọi để lưu lịch sử chăm sóc.");
+      setError("Vui lòng nhập tóm tắt nội dung cuộc gọi để lưu lịch sử chăm sóc tư vấn.");
       return;
     }
 
     setIsSubmitting(true);
     setError(null);
 
-    // Giả lập lưu Call Log vào database & cập nhật khách hàng
     setTimeout(() => {
       setIsSubmitting(false);
       onSuccess({
@@ -50,23 +49,23 @@ export default function CallLogModal({
         sla_alert_level: "none",
       });
       onClose();
-    }, 600);
+    }, 500);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-      <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-[#8B1D2C] to-[#A8242F] text-white flex items-center justify-between">
+      <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        {/* Header - Đỏ tươi */}
+        <div className="px-6 py-4 bg-gradient-to-r from-[#DC2626] to-[#B91C1C] text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-white/20 rounded-xl">
               <Phone className="w-4 h-4 text-white" />
             </div>
             <div>
               <h3 className="font-bold text-sm tracking-tight">
-                Xác Nhận Kết Quả Cuộc Gọi
+                Xác Nhận Kết Quả Cuộc Gọi Tư Vấn
               </h3>
-              <p className="text-[11px] text-[#F3ECD7]">
+              <p className="text-[11px] text-white/90">
                 Khách hàng: {customer.full_name} ({customer.phone})
               </p>
             </div>
@@ -83,7 +82,7 @@ export default function CallLogModal({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2 font-semibold">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -107,7 +106,7 @@ export default function CallLogModal({
                   onClick={() => setCallResult(item.id as any)}
                   className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition-all ${
                     callResult === item.id
-                      ? "border-[#8B1D2C] bg-rose-50/60 text-[#8B1D2C] ring-1 ring-[#8B1D2C]"
+                      ? "border-[#DC2626] bg-red-50 text-[#DC2626] ring-1 ring-[#DC2626]"
                       : "border-slate-200 text-slate-700 hover:bg-slate-50"
                   }`}
                 >
@@ -128,23 +127,23 @@ export default function CallLogModal({
                 min={0}
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#8B1D2C]/20"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">
-                Chuyển trạng thái tuyển sinh
+                Chuyển trạng thái tư vấn
               </label>
               <select
                 value={nextStatus}
                 onChange={(e) => setNextStatus(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#8B1D2C]/20"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20"
               >
                 <option value="consulting">Đang tư vấn</option>
                 <option value="trial_scheduled">Hẹn học thử</option>
                 <option value="considering">Đang cân nhắc</option>
                 <option value="called_unreachable">Chưa liên hệ được</option>
-                <option value="registered">Đã đăng ký</option>
+                <option value="registered">Đã chốt đăng ký</option>
                 <option value="lost">Không tiếp tục</option>
               </select>
             </div>
@@ -174,8 +173,8 @@ export default function CallLogModal({
               rows={3}
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              placeholder="Ví dụ: Phụ huynh trao đổi về khóa Model Kids cho bé 6 tuổi, bé nhút nhát, muốn con tự tin. Hẹn sáng thứ 7 đến học thử..."
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B1D2C]/20"
+              placeholder="Ví dụ: Phụ huynh trao đổi về khóa Model Kids cho bé 7 tuổi, bé nhút nhát. Hẹn sáng thứ 7 đến học thử..."
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20"
             />
           </div>
 
@@ -191,7 +190,7 @@ export default function CallLogModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-1.5 px-5 py-2 text-xs font-bold text-white bg-[#8B1D2C] hover:bg-[#721422] rounded-xl shadow-md transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-5 py-2 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-colors disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4" />
               {isSubmitting ? "Đang lưu..." : "Lưu & Xác Nhận Cuộc Gọi"}

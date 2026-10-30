@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import { BookOpen, Upload, CheckCircle2, Clock, FileText, Check, ShieldCheck } from "lucide-react";
+import { BookOpen, Upload, CheckCircle2, Clock, FileText, Check } from "lucide-react";
 
 interface KnowledgeDoc {
   id: string;
@@ -18,7 +18,7 @@ interface KnowledgeDoc {
 const initialDocs: KnowledgeDoc[] = [
   {
     id: "doc-1",
-    title: "Chính Sách Học Phí & Ưu Đãi Các Khóa 2026",
+    title: "Chính Sách Học Phí & Ưu Đãi Các Khóa Tuyển Sinh 2026",
     category: "Học phí & Chính sách",
     version: "2.1",
     updatedAt: "28/10/2026",
@@ -84,17 +84,18 @@ export default function AiKnowledgePage() {
               { label: "Kho kiến thức & RAG" },
             ]}
           />
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Kho Kiến Thức Nghiệp Vụ &amp; RAG (Retrieval-Augmented Generation)
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-[#DC2626]" />
+            <span>Kho Kiến Thức Nghiệp Vụ &amp; RAG (Retrieval-Augmented Generation)</span>
           </h1>
           <p className="text-xs text-slate-500">
-            Tài liệu nghiệp vụ chính thức. Chỉ các tài liệu đã được Phê duyệt mới được đưa vào Vector Index để AI tham chiếu tư vấn.
+            Tài liệu nghiệp vụ tuyển sinh. Chỉ các tài liệu đã được Phê duyệt mới được đưa vào Vector Index để AI tham chiếu tư vấn.
           </p>
         </div>
 
         <button
           type="button"
-          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#8B1D2C] hover:bg-[#721422] rounded-xl shadow-md transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-colors"
         >
           <Upload className="w-4 h-4" />
           Tải Tài Liệu Mới (PDF / Word)
@@ -120,7 +121,7 @@ export default function AiKnowledgePage() {
               <tr key={doc.id} className="hover:bg-slate-50/80 transition-colors">
                 <td className="px-4 py-3.5">
                   <div className="font-bold text-slate-900 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#8B1D2C]" />
+                    <FileText className="w-4 h-4 text-[#DC2626]" />
                     <span>{doc.title}</span>
                   </div>
                   <span className="text-[11px] text-slate-400">Cập nhật: {doc.updatedAt}</span>
@@ -158,7 +159,7 @@ export default function AiKnowledgePage() {
                       <Check className="w-3 h-3" /> Duyệt đưa vào AI
                     </button>
                   ) : (
-                    <span className="text-slate-400 text-xs">Đang tham chiếu</span>
+                    <span className="text-slate-400 text-xs font-medium">Đang tham chiếu</span>
                   )}
                 </td>
               </tr>

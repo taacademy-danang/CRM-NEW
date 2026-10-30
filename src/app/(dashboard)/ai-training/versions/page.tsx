@@ -45,8 +45,9 @@ export default function AiVersionsPage() {
             { label: "Quản lý phiên bản AI" },
           ]}
         />
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-          Quản Lý Phiên Bản AI (Versioning &amp; Rollback)
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <Layers className="w-6 h-6 text-[#DC2626]" />
+          <span>Quản Lý Phiên Bản AI (Versioning &amp; Rollback)</span>
         </h1>
         <p className="text-xs text-slate-500">
           Vòng đời phiên bản an toàn: Draft &gt; Test &gt; Active. Hỗ trợ khôi phục (Rollback) về phiên bản trước đó ngay lập tức khi phát hiện bất thường.
@@ -61,7 +62,7 @@ export default function AiVersionsPage() {
               key={ver.version}
               className={`p-5 rounded-2xl border transition-all ${
                 isActive
-                  ? "bg-rose-50/50 border-[#8B1D2C] shadow-sm ring-1 ring-[#8B1D2C]/30"
+                  ? "bg-red-50/50 border-[#DC2626] shadow-sm ring-1 ring-[#DC2626]/30"
                   : "bg-white border-slate-200"
               }`}
             >
@@ -91,7 +92,7 @@ export default function AiVersionsPage() {
                   <button
                     type="button"
                     onClick={() => handleRollback(ver.version)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-[#8B1D2C] bg-white hover:bg-rose-50 border border-[#8B1D2C]/30 rounded-xl transition-colors shadow-2xs"
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-[#DC2626] bg-white hover:bg-red-50 border border-[#DC2626]/30 rounded-xl transition-colors shadow-2xs"
                   >
                     <RotateCcw className="w-3.5 h-3.5" /> Khôi phục về phiên bản này (Rollback)
                   </button>

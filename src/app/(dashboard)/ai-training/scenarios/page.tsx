@@ -2,7 +2,7 @@
 
 import React from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import { GitPullRequest, Plus, ArrowRight, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { GitPullRequest, Plus, ArrowRight, CheckCircle2 } from "lucide-react";
 
 const scenarios = [
   {
@@ -53,8 +53,9 @@ export default function AiScenariosPage() {
               { label: "Kịch bản tư vấn chuẩn" },
             ]}
           />
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Quản Lý Kịch Bản Tư Vấn Chuẩn (Guided Scenarios)
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <GitPullRequest className="w-6 h-6 text-[#DC2626]" />
+            <span>Quản Lý Kịch Bản Tư Vấn Chuẩn (Guided Scenarios)</span>
           </h1>
           <p className="text-xs text-slate-500">
             Các kịch bản dẫn dắt có cấu trúc giúp AI luôn kiểm soát mục tiêu hội thoại, hỏi từng câu và không bị lạc đề.
@@ -63,7 +64,7 @@ export default function AiScenariosPage() {
 
         <button
           type="button"
-          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#8B1D2C] hover:bg-[#721422] rounded-xl shadow-md transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-colors"
         >
           <Plus className="w-4 h-4" />
           Tạo Kịch Bản Mới
@@ -95,7 +96,7 @@ export default function AiScenariosPage() {
               </span>
               <button
                 type="button"
-                className="font-bold text-[#8B1D2C] hover:underline flex items-center gap-0.5"
+                className="font-bold text-[#DC2626] hover:underline flex items-center gap-0.5"
               >
                 Chỉnh sửa <ArrowRight className="w-3.5 h-3.5" />
               </button>

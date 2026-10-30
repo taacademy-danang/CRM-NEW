@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --primary-burgundy: #8B1D2C;
-    --primary-dark: #721422;
-    --accent-champagne: #D4AF37;
+    --primary-red: #DC2626; /* Màu đỏ tươi */
+    --primary-red-hover: #B91C1C;
+    --primary-red-light: #FEF2F2;
     --bg-main: #FFFFFF;
     --bg-secondary: #F8FAFC;
-    --text-primary: #1E293B;
-    --text-secondary: #64748B;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
   }
 
   body {
@@ -22,7 +22,7 @@
   }
 }
 
-/* Custom scrollbar for CRM tables & chat windows */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

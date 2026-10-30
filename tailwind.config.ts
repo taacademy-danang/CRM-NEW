@@ -10,29 +10,17 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: "#FCF4F5",
-          100: "#F9E8E9",
-          200: "#F2C7C9",
-          300: "#E99FA3",
-          400: "#DC6C73",
-          500: "#C43842",
-          600: "#A8242F",
-          700: "#8B1D2C", // Màu chủ đạo T.A Academy Wine Red
-          800: "#721422", // Màu nền thanh bên đậm
-          900: "#5A0E1A",
-          950: "#36050C",
-        },
-        champagne: {
-          50: "#FAF7EE",
-          100: "#F3ECD7",
-          200: "#E7D8AF",
-          300: "#DAC387",
-          400: "#CCA95E",
-          500: "#D4AF37", // Màu vàng champagne hoàng gia
-          600: "#C5A059",
-          700: "#996515",
-          800: "#7A5013",
-          900: "#5A3A0E",
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444", // Đỏ tươi
+          600: "#DC2626", // Đỏ tươi chuẩn (Primary)
+          700: "#B91C1C", // Đỏ đậm thanh lịch
+          800: "#991B1B",
+          900: "#7F1D1D",
+          950: "#450A0A",
         },
       },
       fontFamily: {
