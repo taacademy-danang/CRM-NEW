@@ -1,6 +1,6 @@
 /**
  * T.A ACADEMY CRM CONSTANTS & NAVIGATION DEFINITIONS
- * Đỏ tươi hiện đại, chuyên sâu nghiệp vụ tiếp nhận và tư vấn tuyển sinh
+ * Tone Đỏ tươi hiện đại, Quản lý khách hàng tư vấn & Tác vụ AI tự động
  */
 
 export const BRAND_CONFIG = {
@@ -8,7 +8,7 @@ export const BRAND_CONFIG = {
   tagline: "PHONG THÁI - CATWALK - MODEL KIDS",
   quote: "Tỏa sáng Phong thái Việt",
   logoInitials: "TA",
-  primaryColor: "#DC2626", // Màu đỏ tươi chuẩn
+  primaryColor: "#DC2626", // Đỏ tươi chuẩn
 };
 
 export const SLA_CONFIG = {
@@ -40,9 +40,14 @@ export const MAIN_NAVIGATION: NavigationItem[] = [
     badge: 12,
   },
   {
-    name: "Tiếp nhận tư vấn",
+    name: "Quản lý khách hàng tư vấn",
     href: "/consultations",
-    iconName: "UserCheck",
+    iconName: "Users",
+  },
+  {
+    name: "AI Tự động hóa tác vụ lặp lại",
+    href: "/ai-tasks",
+    iconName: "Cpu",
   },
   {
     name: "Trung tâm đào tạo AI",
@@ -61,11 +66,6 @@ export const MAIN_NAVIGATION: NavigationItem[] = [
     ],
   },
   {
-    name: "Quy trình tư vấn (Workflow)",
-    href: "/workflows",
-    iconName: "GitFork",
-  },
-  {
     name: "Cài đặt hệ thống",
     href: "/settings",
     iconName: "Settings",
@@ -74,11 +74,10 @@ export const MAIN_NAVIGATION: NavigationItem[] = [
 
 export const COURSE_OPTIONS = [
   { id: "all", label: "Tất cả khóa học" },
-  { id: "model_kids", label: "Model Kids (Mẫu Nhí Tài Năng)" },
-  { id: "phong_thai_quy_co", label: "Phong Thái Quý Cô" },
-  { id: "phong_thai_doanh_nhan", label: "Phong Thái Doanh Nhân" },
-  { id: "catwalk_pro", label: "Catwalk Chuyên Nghiệp" },
-  { id: "giao_tiep", label: "Nghệ Thuật Giao Tiếp & Thuyết Trình" },
+  { id: "model_kids", label: "Model Kids (Mẫu Nhí)" },
+  { id: "phong_thai", label: "Phong Thái" },
+  { id: "catwalk", label: "Catwalk" },
+  { id: "giao_tiep", label: "Giao Tiếp & Thuyết Trình" },
 ];
 
 export const SOURCE_OPTIONS = [
@@ -87,18 +86,14 @@ export const SOURCE_OPTIONS = [
   { id: "zalo", label: "Zalo Official Account" },
   { id: "hotline", label: "Hotline Trực Tiếp" },
   { id: "website", label: "Website T.A Academy" },
-  { id: "referral", label: "Khách giới thiệu" },
 ];
 
 export const STATUS_OPTIONS = [
-  { id: "all", label: "Tất cả trạng thái" },
-  { id: "new", label: "Khách mới" },
-  { id: "uncalled", label: "Chưa gọi (SLA)" },
-  { id: "called_unreachable", label: "Không nghe máy" },
-  { id: "contacted", label: "Đã liên hệ" },
+  { id: "all", label: "Tất cả tình trạng" },
   { id: "consulting", label: "Đang tư vấn" },
+  { id: "called", label: "Đã gọi tư vấn" },
+  { id: "uncalled", label: "Chưa gọi (Cần liên hệ)" },
   { id: "trial_scheduled", label: "Hẹn học thử" },
-  { id: "considering", label: "Đang cân nhắc" },
-  { id: "registered", label: "Đã chốt đăng ký" },
+  { id: "registered", label: "Đã đăng ký (Chuyển E-learning)" },
   { id: "lost", label: "Không tiếp tục" },
 ];

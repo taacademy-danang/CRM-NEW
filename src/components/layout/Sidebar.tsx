@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Mail,
-  UserCheck,
+  Users,
+  Cpu,
   Bot,
-  GitFork,
   Settings,
   ChevronDown,
   Sparkles,
@@ -17,13 +17,12 @@ import {
 import { MAIN_NAVIGATION, BRAND_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-// Map icon string to Lucide component
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard,
   Mail,
-  UserCheck,
+  Users,
+  Cpu,
   Bot,
-  GitFork,
   Settings,
 };
 
@@ -141,7 +140,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* 3. Bottom Brand Card - Đỏ tươi & Trắng */}
+      {/* 3. Bottom Brand Card */}
       <div className="p-3 mt-auto">
         <div className="rounded-2xl bg-black/20 p-3.5 border border-white/20 shadow-md text-center">
           <div className="flex items-center justify-center gap-1.5 text-white mb-1">
