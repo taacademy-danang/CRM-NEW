@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import CallLogModal from "@/components/dashboard/CallLogModal";
+import ReassignModal from "@/components/dashboard/ReassignModal";
 import { Customer } from "@/types/crm";
 import {
   Users,
@@ -17,74 +18,83 @@ import {
   Phone,
   Calendar,
   TrendingUp,
-  Bot,
   ExternalLink,
   UserCheck,
+  RefreshCw,
+  MessageSquare,
+  ArrowRight,
 } from "lucide-react";
 
-// Dữ liệu hàng đợi ưu tiên cao
-const initialUncalledLeads: Customer[] = [
-  {
-    id: "lead-01",
-    customer_code: "TV-2026-001",
-    full_name: "Phạm Thu Hương",
-    phone: "0988123456",
-    source: "facebook",
-    status: "uncalled",
-    call_status: "pending",
-    first_phone_received_at: new Date(Date.now() - 65 * 60 * 1000).toISOString(), // 65 phút (>60m: Đỏ nguy cấp)
-    sla_alert_level: "danger_60m",
-    assigned_to_name: "Trần Văn Bình",
-    interested_course_title: "Model Kids (Mẫu Nhí Tài Năng)",
-    waiting_minutes: 65,
-    notes: "Bé 7 tuổi nhút nhát, muốn rèn dáng đi tự tin",
-    created_at: new Date(Date.now() - 70 * 60 * 1000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "lead-02",
-    customer_code: "TV-2026-002",
-    full_name: "Nguyễn Hoàng Nam",
-    phone: "0912345888",
-    source: "zalo",
-    status: "uncalled",
-    call_status: "pending",
-    first_phone_received_at: new Date(Date.now() - 25 * 60 * 1000).toISOString(), // 25 phút (>15m: Cảnh báo)
-    sla_alert_level: "warning_15m",
-    assigned_to_name: "Lê Minh Trang",
-    interested_course_title: "Phong Thái Doanh Nhân",
-    waiting_minutes: 25,
-    notes: "Hỏi lịch học ngoài giờ",
-    created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "lead-03",
-    customer_code: "TV-2026-003",
-    full_name: "Hoàng Kiều Trinh",
-    phone: "0909555666",
-    source: "facebook",
-    status: "uncalled",
-    call_status: "pending",
-    first_phone_received_at: new Date(Date.now() - 6 * 60 * 1000).toISOString(), // 6 phút
-    sla_alert_level: "none",
-    assigned_to_name: "Trần Văn Bình",
-    interested_course_title: "Catwalk Chuyên Nghiệp",
-    waiting_minutes: 6,
-    notes: "Quan tâm lớp sân khấu",
-    created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
 export default function DashboardPage() {
-  const [uncalledLeads, setUncalledLeads] = useState<Customer[]>(initialUncalledLeads);
+  const [uncalledLeads, setUncalledLeads] = useState<Customer[]>([]);
+  const [stats, setStats] = useState({
+    total_customers: 1280,
+    new_today: 42,
+    uncalled_count: 3,
+    consulting_count: 96,
+    need_care_count: 34,
+    registered_count: 145,
+  });
+  const [loading, setLoading] = useState(true);
   const [selectedCustomerForCall, setSelectedCustomerForCall] = useState<Customer | null>(null);
+  const [selectedCustomerForReassign, setSelectedCustomerForReassign] = useState<Customer | null>(null);
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+  const [isReassignModalOpen, setIsReassignModalOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [leadsRes, statsRes] = await Promise.all([
+        fetch("/api/dashboard/uncalled-leads"),
+        fetch("/api/dashboard/stats"),
+      ]);
+
+      if (leadsRes.ok) {
+        const leadsData = await leadsRes.json();
+        if (leadsData.success) {
+          setUncalledLeads(leadsData.data);
+        }
+      }
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        if (statsData.success) {
+          setStats(statsData.data);
+        }
+      }
+    } catch (err) {
+      console.error("Lỗi tải dữ liệu dashboard:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   const handleCallSuccess = (updatedCustomer: Customer) => {
     setUncalledLeads((prev) => prev.filter((c) => c.id !== updatedCustomer.id));
+    setStats((prev) => ({
+      ...prev,
+      uncalled_count: Math.max(0, prev.uncalled_count - 1),
+      consulting_count: prev.consulting_count + 1,
+    }));
+    showToast(`Đã lưu cuộc gọi thành công cho khách hàng ${updatedCustomer.full_name}`);
+  };
+
+  const handleReassignSuccess = (updatedCustomer: Customer) => {
+    setUncalledLeads((prev) =>
+      prev.map((c) => (c.id === updatedCustomer.id ? updatedCustomer : c))
+    );
+    showToast(`Đã chuyển khách hàng cho tư vấn viên ${updatedCustomer.assigned_to_name}`);
   };
 
   const copyPhoneNumber = (phone: string, id: string) => {
@@ -93,13 +103,16 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleOpenCallModal = (lead: Customer) => {
-    setSelectedCustomerForCall(lead);
-    setIsCallModalOpen(true);
-  };
-
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="fixed top-5 right-5 z-50 bg-[#DC2626] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-bold animate-in fade-in slide-in-from-top-3 duration-200">
+          <Check className="w-4 h-4" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* 1. Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -113,6 +126,14 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={fetchDashboardData}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 shadow-xs transition-colors"
+            title="Làm mới dữ liệu"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${loading ? "animate-spin" : ""}`} />
+            <span>Làm mới</span>
+          </button>
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-xs">
             <Calendar className="w-3.5 h-3.5 text-[#DC2626]" />
             <span>Hôm nay: {new Date().toLocaleDateString("vi-VN")}</span>
@@ -129,7 +150,7 @@ export default function DashboardPage() {
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-slate-900">1.280</div>
+          <div className="text-2xl font-extrabold text-slate-900">{stats.total_customers}</div>
           <div className="text-[11px] text-emerald-600 font-semibold flex items-center gap-0.5 mt-1">
             <TrendingUp className="w-3 h-3" /> +14% tháng này
           </div>
@@ -142,7 +163,7 @@ export default function DashboardPage() {
               <UserPlus className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-[#DC2626]">42</div>
+          <div className="text-2xl font-extrabold text-[#DC2626]">{stats.new_today}</div>
           <div className="text-[11px] text-slate-500 mt-1">Từ FB, Zalo &amp; Hotline</div>
         </div>
 
@@ -167,7 +188,7 @@ export default function DashboardPage() {
               <Sparkles className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-purple-700">96</div>
+          <div className="text-2xl font-extrabold text-purple-700">{stats.consulting_count}</div>
           <div className="text-[11px] text-slate-500 mt-1">Theo dõi chuyên sâu</div>
         </div>
 
@@ -178,7 +199,7 @@ export default function DashboardPage() {
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-indigo-700">34</div>
+          <div className="text-2xl font-extrabold text-indigo-700">{stats.need_care_count}</div>
           <div className="text-[11px] text-slate-500 mt-1">Lịch học tuần này</div>
         </div>
 
@@ -189,8 +210,8 @@ export default function DashboardPage() {
               <Award className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-emerald-700">145</div>
-          <div className="text-[11px] text-emerald-700 font-semibold mt-1">Tỷ lệ chốt: 28.5%</div>
+          <div className="text-2xl font-extrabold text-emerald-700">{stats.registered_count}</div>
+          <div className="text-[11px] text-emerald-700 font-semibold mt-1">Đồng bộ E-learning</div>
         </div>
       </div>
 
@@ -258,7 +279,8 @@ export default function DashboardPage() {
               <tbody className="divide-y divide-slate-100">
                 {uncalledLeads.map((lead) => {
                   const isDanger = lead.waiting_minutes && lead.waiting_minutes >= 60;
-                  const isWarning = lead.waiting_minutes && lead.waiting_minutes >= 15 && lead.waiting_minutes < 60;
+                  const isWarning =
+                    lead.waiting_minutes && lead.waiting_minutes >= 15 && lead.waiting_minutes < 60;
 
                   return (
                     <tr
@@ -325,7 +347,11 @@ export default function DashboardPage() {
                       <td className="px-4 py-3.5">
                         <span
                           className={`font-mono font-bold ${
-                            isDanger ? "text-red-700 text-sm" : isWarning ? "text-amber-700 font-semibold" : "text-slate-600"
+                            isDanger
+                              ? "text-red-700 text-sm"
+                              : isWarning
+                              ? "text-amber-700 font-semibold"
+                              : "text-slate-600"
                           }`}
                         >
                           {lead.waiting_minutes} phút
@@ -333,13 +359,29 @@ export default function DashboardPage() {
                       </td>
 
                       <td className="px-4 py-3.5 font-medium text-slate-800">
-                        {lead.assigned_to_name || "Chưa giao"}
+                        <div className="flex items-center gap-1.5">
+                          <span>{lead.assigned_to_name || "Chưa giao"}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedCustomerForReassign(lead);
+                              setIsReassignModalOpen(true);
+                            }}
+                            className="p-1 text-slate-400 hover:text-[#DC2626] hover:bg-red-50 rounded"
+                            title="Chuyển nhân viên"
+                          >
+                            <UserCheck className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
 
                       <td className="px-4 py-3.5 text-right space-x-1.5">
                         <button
                           type="button"
-                          onClick={() => handleOpenCallModal(lead)}
+                          onClick={() => {
+                            setSelectedCustomerForCall(lead);
+                            setIsCallModalOpen(true);
+                          }}
                           className="px-3 py-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl font-bold shadow-xs transition-colors inline-flex items-center gap-1"
                         >
                           <Phone className="w-3 h-3" />
@@ -363,6 +405,136 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* 4. Hai Cột: Công việc hôm nay & Nhật ký hoạt động */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Công việc hôm nay */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#DC2626]" />
+              Công Việc Cần Xử Lý Hôm Nay
+            </h3>
+            <span className="text-[11px] font-semibold text-slate-500">6 đầu việc</span>
+          </div>
+
+          <div className="space-y-2.5">
+            {[
+              {
+                title: "Gọi lại cho phụ huynh bé Hoàng Kiều Trinh (Hẹn 15:30)",
+                type: "call",
+                urgent: true,
+                course: "Catwalk",
+              },
+              {
+                title: "Chăm sóc 3 phụ huynh lớp Model Kids sau buổi học thử hôm qua",
+                type: "care",
+                urgent: false,
+                course: "Model Kids",
+              },
+              {
+                title: "Kiểm tra danh sách 5 học viên đã đăng ký đã xếp lớp E-learning K26",
+                type: "elearning",
+                urgent: false,
+                course: "Phong Thái",
+              },
+              {
+                title: "Xử lý 2 hội thoại AI vừa yêu cầu chuyển nhân viên tư vấn",
+                type: "ai_transfer",
+                urgent: true,
+                course: "Đa khóa học",
+              },
+            ].map((task, idx) => (
+              <div
+                key={idx}
+                className="p-3 bg-slate-50 hover:bg-red-50/30 rounded-xl border border-slate-200/80 flex items-center justify-between gap-3 text-xs transition-colors"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-800">{task.title}</span>
+                    {task.urgent && (
+                      <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">
+                        Gấp
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-slate-500">Khóa học: {task.course}</span>
+                </div>
+                <a
+                  href="/consultations"
+                  className="p-1.5 text-slate-400 hover:text-[#DC2626] rounded"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Nhật ký hoạt động hệ thống */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-[#DC2626]" />
+              Nhật Ký Tiếp Nhận &amp; Hoạt Động Mới Nhất
+            </h3>
+            <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Trực tuyến
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                time: "14:32",
+                actor: "AI An An",
+                action: "Tự động trích xuất và cập nhật SĐT khách hàng: 0988123456",
+                type: "ai",
+              },
+              {
+                time: "14:28",
+                actor: "Trần Văn Bình",
+                action: "Xác nhận cuộc gọi tư vấn thành công với phụ huynh Nguyễn Hoàng Nam (3m 45s)",
+                type: "human",
+              },
+              {
+                time: "14:15",
+                actor: "Hệ thống",
+                action: "Tự động đồng bộ học viên Vũ Mai Phương sang E-learning lớp Phong Thái K26",
+                type: "system",
+              },
+              {
+                time: "13:50",
+                actor: "Nguyễn Thị Lan",
+                action: "Bàn giao hồ sơ khách hàng Hoàng Kiều Trinh cho nhân viên Lê Minh Trang",
+                type: "human",
+              },
+            ].map((log, idx) => (
+              <div key={idx} className="flex items-start gap-3 text-xs">
+                <span className="font-mono text-slate-400 text-[11px] shrink-0 pt-0.5">
+                  {log.time}
+                </span>
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${
+                        log.type === "ai"
+                          ? "bg-purple-100 text-purple-700"
+                          : log.type === "system"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-red-100 text-[#DC2626]"
+                      }`}
+                    >
+                      {log.actor}
+                    </span>
+                  </div>
+                  <p className="text-slate-700 text-xs">{log.action}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Modal ghi nhận cuộc gọi */}
       <CallLogModal
         customer={selectedCustomerForCall}
@@ -372,6 +544,17 @@ export default function DashboardPage() {
           setSelectedCustomerForCall(null);
         }}
         onSuccess={handleCallSuccess}
+      />
+
+      {/* Modal chuyển nhân viên phụ trách */}
+      <ReassignModal
+        customer={selectedCustomerForReassign}
+        isOpen={isReassignModalOpen}
+        onClose={() => {
+          setIsReassignModalOpen(false);
+          setSelectedCustomerForReassign(null);
+        }}
+        onSuccess={handleReassignSuccess}
       />
     </div>
   );

@@ -29,7 +29,7 @@ export default function CallLogModal({
 
   if (!isOpen || !customer) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!summary.trim()) {
       setError("Vui lòng nhập tóm tắt nội dung cuộc gọi để lưu lịch sử chăm sóc tư vấn.");
@@ -39,17 +39,34 @@ export default function CallLogModal({
     setIsSubmitting(true);
     setError(null);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onSuccess({
-        ...customer,
-        call_status: callResult === "connected" ? "contacted" : "unreachable",
-        status: (nextStatus as any) || "consulting",
-        last_called_at: new Date().toISOString(),
-        sla_alert_level: "none",
+    try {
+      const res = await fetch("/api/calls/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_id: customer.id,
+          phone_called: customer.phone || "0000000000",
+          call_result: callResult,
+          duration_seconds: duration,
+          call_summary: summary.trim(),
+          recall_at: recallDate || null,
+          next_status: nextStatus,
+          agent_name: customer.assigned_to_name || "Trần Văn Bình",
+        }),
       });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Lỗi lưu cuộc gọi");
+      }
+
+      onSuccess(json.data.customer);
       onClose();
-    }, 500);
+    } catch (err: any) {
+      setError(err.message || "Không thể kết nối đến máy chủ");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

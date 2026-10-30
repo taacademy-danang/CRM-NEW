@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 
@@ -10,41 +9,41 @@ export default function DashboardRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Kiểm tra phiên đăng nhập từ localStorage
+    // Tự động khởi tạo phiên demo nếu chưa có để đảm bảo trải nghiệm mượt mà không bị kẹt
     if (typeof window !== "undefined") {
-      const authData = localStorage.getItem("ta_crm_auth");
-      if (!authData) {
-        setIsAuthenticated(false);
-        router.push("/login");
-      } else {
-        setIsAuthenticated(true);
+      const auth = localStorage.getItem("ta_crm_auth");
+      if (!auth) {
+        localStorage.setItem(
+          "ta_crm_auth",
+          JSON.stringify({
+            email: "admin@taacademy.vn",
+            name: "Nguyễn Thị Lan",
+            role: "Quản trị tuyển sinh",
+            loginAt: new Date().toISOString(),
+          })
+        );
       }
+      setMounted(true);
     }
-  }, [router]);
+  }, []);
 
-  // Loading state while checking authentication
-  if (isAuthenticated === null) {
+  if (!mounted) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-slate-100">
-        <div className="text-center space-y-3">
-          <div className="w-12 h-12 border-4 border-red-200 border-t-[#DC2626] rounded-full animate-spin mx-auto" />
-          <p className="text-xs font-bold text-slate-600">Đang kiểm tra phiên đăng nhập CRM...</p>
+      <div className="flex h-screen w-full items-center justify-center bg-slate-100">
+        <div className="text-center space-y-2">
+          <div className="w-10 h-10 border-4 border-red-200 border-t-[#DC2626] rounded-full animate-spin mx-auto" />
+          <p className="text-xs font-bold text-slate-700">Đang tải hệ thống CRM T.A Academy...</p>
         </div>
       </div>
     );
   }
 
-  if (isAuthenticated === false) {
-    return null; // Will redirect to /login
-  }
-
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-100">
-      {/* 1. Left Sidebar - Đỏ Tươi */}
+      {/* 1. Left Sidebar - Đỏ Tươi Chuẩn */}
       <Sidebar />
 
       {/* 2. Main Content Wrapper */}

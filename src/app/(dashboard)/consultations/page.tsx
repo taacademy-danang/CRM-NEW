@@ -1,119 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import CallLogModal from "@/components/dashboard/CallLogModal";
 import {
   Users,
   Search,
-  Filter,
   Plus,
   Phone,
   MessageSquare,
   Clock,
   CheckCircle2,
-  AlertTriangle,
   ChevronDown,
   Sparkles,
   X,
   UserPlus,
   GraduationCap,
-  ArrowRight,
-  ExternalLink,
   Bot,
+  RefreshCw,
+  Check,
 } from "lucide-react";
-import { COURSE_OPTIONS, SOURCE_OPTIONS, STATUS_OPTIONS } from "@/lib/constants";
 import { Customer } from "@/types/crm";
 
-interface CustomerConsultationRow {
+export interface CustomerConsultationRow {
   stt: number;
   id: string;
   customerName: string;
   phone: string | null;
-  phoneAutoExtracted: boolean; // Tự động cập nhật trong quá trình tư vấn
+  phoneAutoExtracted: boolean;
   courseRef: "model_kids" | "phong_thai" | "catwalk" | "giao_tiep";
   courseRefLabel: string;
-  aiExtractedNeed: string; // Tự động xác định nhu cầu trong tin nhắn
+  aiExtractedNeed: string;
   careStatus: "consulting" | "called" | "uncalled" | "trial_scheduled" | "registered" | "lost";
   elearningStatus: "synced" | "pending" | "not_enrolled";
   elearningClass?: string;
   receivedAt: string;
+  source?: string;
 }
 
-const initialConsultationRows: CustomerConsultationRow[] = [
-  {
-    stt: 1,
-    id: "lead-01",
-    customerName: "Phạm Thu Hương",
-    phone: "0988123456",
-    phoneAutoExtracted: true,
-    courseRef: "model_kids",
-    courseRefLabel: "Model Kids",
-    aiExtractedNeed: "Bé 7 tuổi nhút nhát, lưng đi hơi gù, phụ huynh muốn con tự tin trước đám đông và rèn dáng đi chuẩn",
-    careStatus: "uncalled",
-    elearningStatus: "not_enrolled",
-    receivedAt: "14:10 Hôm nay",
-  },
-  {
-    stt: 2,
-    id: "lead-02",
-    customerName: "Nguyễn Hoàng Nam",
-    phone: "0912345888",
-    phoneAutoExtracted: true,
-    courseRef: "phong_thai",
-    courseRefLabel: "Phong Thái",
-    aiExtractedNeed: "Doanh nhân muốn học nâng tầm phong thái giao tiếp, thần thái đàm phán kinh doanh và tạo ấn tượng đối tác",
-    careStatus: "called",
-    elearningStatus: "not_enrolled",
-    receivedAt: "13:45 Hôm nay",
-  },
-  {
-    stt: 3,
-    id: "lead-03",
-    customerName: "Hoàng Kiều Trinh",
-    phone: "0909555666",
-    phoneAutoExtracted: false,
-    courseRef: "catwalk",
-    courseRefLabel: "Catwalk",
-    aiExtractedNeed: "Đam mê thời trang, muốn rèn giải phóng hình thể sân khấu và tìm kiếm cơ hội casting show diễn thời trang lớn",
-    careStatus: "trial_scheduled",
-    elearningStatus: "not_enrolled",
-    receivedAt: "10:15 Hôm nay",
-  },
-  {
-    stt: 4,
-    id: "lead-04",
-    customerName: "Vũ Mai Phương",
-    phone: "0934888999",
-    phoneAutoExtracted: true,
-    courseRef: "phong_thai",
-    courseRefLabel: "Phong Thái",
-    aiExtractedNeed: "Cần chỉnh dáng đứng, dáng ngồi quý cô thanh lịch và tự tin thuyết trình truyền cảm hứng",
-    careStatus: "registered",
-    elearningStatus: "synced",
-    elearningClass: "Lớp Phong Thái K26 (Đã xếp lớp)",
-    receivedAt: "Hôm qua",
-  },
-  {
-    stt: 5,
-    id: "lead-05",
-    customerName: "Trần Bảo Ngọc",
-    phone: null, // Chưa có SĐT
-    phoneAutoExtracted: false,
-    courseRef: "model_kids",
-    courseRefLabel: "Model Kids",
-    aiExtractedNeed: "Đang hỏi thăm lịch học cho bé 5 tuổi vào cuối tuần, AI đang tiếp tục tư vấn xin số điện thoại",
-    careStatus: "consulting",
-    elearningStatus: "not_enrolled",
-    receivedAt: "14:25 Hôm nay",
-  },
-];
-
 export default function ConsultationCustomerManagementPage() {
-  const [data, setData] = useState<CustomerConsultationRow[]>(initialConsultationRows);
+  const [data, setData] = useState<CustomerConsultationRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCourse, setFilterCourse] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Modal tiếp nhận khách mới
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -126,57 +57,95 @@ export default function ConsultationCustomerManagementPage() {
   const [selectedCustomerForCall, setSelectedCustomerForCall] = useState<Customer | null>(null);
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
 
-  // Đổi trạng thái chăm sóc trực tiếp trên bảng
-  const handleStatusChange = (id: string, newStatus: CustomerConsultationRow["careStatus"]) => {
-    setData((prev) =>
-      prev.map((row) => {
-        if (row.id === id) {
-          const isRegistered = newStatus === "registered";
-          return {
-            ...row,
-            careStatus: newStatus,
-            // Khách nào đã đăng ký thì TỰ ĐỘNG CHUYỂN QUA ELEARNING để xếp lớp
-            elearningStatus: isRegistered ? "synced" : row.elearningStatus,
-            elearningClass: isRegistered
-              ? `Lớp ${row.courseRefLabel} K${new Date().getMonth() + 1} (Tự động chuyển)`
-              : row.elearningClass,
-          };
-        }
-        return row;
-      })
-    );
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleCreateCustomer = (e: React.FormEvent) => {
+  const fetchConsultations = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (searchTerm) params.set("search", searchTerm);
+      if (filterCourse !== "all") params.set("course", filterCourse);
+      if (filterStatus !== "all") params.set("status", filterStatus);
+
+      const res = await fetch(`/api/consultations?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setData(json.data);
+        }
+      }
+    } catch (err) {
+      console.error("Lỗi tải danh sách tư vấn:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchConsultations();
+  }, [filterCourse, filterStatus]);
+
+  // Đổi trạng thái chăm sóc trực tiếp trên bảng
+  const handleStatusChange = async (id: string, newStatus: CustomerConsultationRow["careStatus"]) => {
+    try {
+      const res = await fetch("/api/consultations", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, careStatus: newStatus }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Lỗi cập nhật trạng thái");
+      }
+
+      setData((prev) =>
+        prev.map((row) => (row.id === id ? { ...row, ...json.data } : row))
+      );
+
+      if (newStatus === "registered") {
+        showToast("Đã đồng bộ sang E-learning & Tự động xếp lớp cho học viên!");
+      } else {
+        showToast("Đã cập nhật tình trạng chăm sóc thành công");
+      }
+    } catch (err: any) {
+      alert(err.message || "Có lỗi xảy ra");
+    }
+  };
+
+  const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim()) return;
 
-    const courseMap = {
-      model_kids: "Model Kids",
-      phong_thai: "Phong Thái",
-      catwalk: "Catwalk",
-      giao_tiep: "Giao Tiếp & Thuyết Trình",
-    };
+    try {
+      const res = await fetch("/api/consultations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: newName.trim(),
+          phone: newPhone.trim() ? newPhone.trim() : null,
+          courseRef: newCourse,
+          aiExtractedNeed: newNeed.trim() || undefined,
+        }),
+      });
 
-    const newRow: CustomerConsultationRow = {
-      stt: data.length + 1,
-      id: `lead-${Date.now()}`,
-      customerName: newName,
-      phone: newPhone.trim() ? newPhone.trim() : null,
-      phoneAutoExtracted: false,
-      courseRef: newCourse,
-      courseRefLabel: courseMap[newCourse],
-      aiExtractedNeed: newNeed.trim() || "AI đang kết nối phân tích nhu cầu qua đoạn tin nhắn...",
-      careStatus: "consulting",
-      elearningStatus: "not_enrolled",
-      receivedAt: "Vừa xong",
-    };
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Lỗi tạo hồ sơ tư vấn");
+      }
 
-    setData([newRow, ...data]);
-    setIsAddModalOpen(false);
-    setNewName("");
-    setNewPhone("");
-    setNewNeed("");
+      setData([json.data, ...data]);
+      setIsAddModalOpen(false);
+      setNewName("");
+      setNewPhone("");
+      setNewNeed("");
+      showToast("Đã tiếp nhận hồ sơ khách hàng tư vấn mới thành công!");
+    } catch (err: any) {
+      alert(err.message || "Có lỗi xảy ra");
+    }
   };
 
   const handleOpenCall = (row: CustomerConsultationRow) => {
@@ -200,21 +169,26 @@ export default function ConsultationCustomerManagementPage() {
     handleStatusChange(updated.id, "called");
   };
 
-  // Lọc dữ liệu
   const filteredData = data.filter((row) => {
-    const matchSearch =
-      row.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (row.phone && row.phone.includes(searchTerm)) ||
-      row.aiExtractedNeed.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchCourse = filterCourse === "all" || row.courseRef === filterCourse;
-    const matchStatus = filterStatus === "all" || row.careStatus === filterStatus;
-
-    return matchSearch && matchCourse && matchStatus;
+    if (!searchTerm.trim()) return true;
+    const q = searchTerm.toLowerCase();
+    return (
+      row.customerName.toLowerCase().includes(q) ||
+      (row.phone && row.phone.includes(q)) ||
+      row.aiExtractedNeed.toLowerCase().includes(q)
+    );
   });
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="fixed top-5 right-5 z-50 bg-[#DC2626] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-bold animate-in fade-in slide-in-from-top-3 duration-200">
+          <Check className="w-4 h-4" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* 1. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -228,14 +202,25 @@ export default function ConsultationCustomerManagementPage() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-all active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          Tiếp Nhận Khách Hàng Mới
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={fetchConsultations}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-xs"
+            title="Làm mới"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span>Làm mới</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-all active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            Tiếp Nhận Khách Hàng Mới
+          </button>
+        </div>
       </div>
 
       {/* 2. Thanh Lọc Dropdowns & Tìm Kiếm */}
@@ -309,136 +294,144 @@ export default function ConsultationCustomerManagementPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredData.map((row, index) => (
-                <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
-                  {/* CỘT 1: STT */}
-                  <td className="px-3 py-4 text-center font-bold text-slate-500">
-                    {index + 1}
-                  </td>
-
-                  {/* CỘT 2: KHÁCH HÀNG */}
-                  <td className="px-4 py-4">
-                    <div className="font-bold text-slate-900 text-sm">
-                      {row.customerName}
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      Tiếp nhận: {row.receivedAt}
-                    </span>
-                  </td>
-
-                  {/* CỘT 3: SDT (TỰ ĐỘNG CẬP NHẬT TRONG QUÁ TRÌNH TƯ VẤN) */}
-                  <td className="px-4 py-4">
-                    {row.phone ? (
-                      <div className="space-y-1">
-                        <span className="font-mono font-bold text-slate-900 text-sm block">
-                          {row.phone}
-                        </span>
-                        {row.phoneAutoExtracted ? (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
-                            AI tự động lưu từ chat
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-slate-400">Đã xác thực</span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                        <Clock className="w-3 h-3 text-amber-600" />
-                        AI đang xin số...
-                      </span>
-                    )}
-                  </td>
-
-                  {/* CỘT 4: KHÓA HỌC THAM KHẢO (MODEL KIDS / PHONG THÁI / CATWALK) */}
-                  <td className="px-4 py-4">
-                    <span className="px-2.5 py-1 bg-red-50 text-[#DC2626] font-bold rounded-lg border border-red-100 text-xs inline-block">
-                      {row.courseRefLabel}
-                    </span>
-                  </td>
-
-                  {/* CỘT 5: NHU CẦU (TỰ ĐỘNG XÁC ĐỊNH TỪ ĐOẠN TIN NHẮN) */}
-                  <td className="px-5 py-4">
-                    <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                      <div className="flex items-center gap-1 text-[10px] font-bold text-[#DC2626]">
-                        <Bot className="w-3 h-3 text-[#DC2626]" />
-                        <span>AI Nhận Diện Nhu Cầu:</span>
-                      </div>
-                      <p className="text-slate-800 leading-relaxed font-medium">
-                        "{row.aiExtractedNeed}"
-                      </p>
-                    </div>
-                  </td>
-
-                  {/* CỘT 6: TÌNH TRẠNG CHĂM SÓC (DROPDOWN THAY ĐỔI TRỰC TIẾP) */}
-                  <td className="px-4 py-4">
-                    <select
-                      value={row.careStatus}
-                      onChange={(e) => handleStatusChange(row.id, e.target.value as any)}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
-                        row.careStatus === "registered"
-                          ? "bg-emerald-50 text-emerald-800 border-emerald-300 ring-1 ring-emerald-300"
-                          : row.careStatus === "trial_scheduled"
-                          ? "bg-indigo-50 text-indigo-800 border-indigo-200"
-                          : row.careStatus === "uncalled"
-                          ? "bg-red-50 text-[#DC2626] border-red-200 font-black animate-pulse"
-                          : "bg-white text-slate-800 border-slate-200"
-                      }`}
-                    >
-                      <option value="consulting">Đang tư vấn</option>
-                      <option value="called">Đã gọi tư vấn</option>
-                      <option value="uncalled">Chưa gọi (Cần liên hệ)</option>
-                      <option value="trial_scheduled">Hẹn học thử</option>
-                      <option value="registered">Đã đăng ký</option>
-                      <option value="lost">Không tiếp tục</option>
-                    </select>
-                  </td>
-
-                  {/* CỘT 7: ELEARNING (TỰ ĐỘNG CHUYỂN KHI ĐÃ ĐĂNG KÝ ĐỂ XẾP LỚP) */}
-                  <td className="px-4 py-4">
-                    {row.elearningStatus === "synced" ? (
-                      <div className="space-y-1">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          Đã chuyển E-learning
-                        </span>
-                        <div className="text-[10px] text-slate-600 font-semibold flex items-center gap-1">
-                          <GraduationCap className="w-3 h-3 text-emerald-700" />
-                          <span>{row.elearningClass || "Chờ xếp lớp K26"}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-slate-400 text-[11px]">
-                        <span>Chưa chuyển</span>
-                        <div className="text-[10px] text-slate-400">
-                          (Tự động chuyển khi Đã đăng ký)
-                        </div>
-                      </div>
-                    )}
-                  </td>
-
-                  {/* Thao tác */}
-                  <td className="px-4 py-4 text-right space-x-1.5">
-                    {row.phone && (
-                      <button
-                        type="button"
-                        onClick={() => handleOpenCall(row)}
-                        className="px-2.5 py-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs"
-                        title="Gọi tư vấn"
-                      >
-                        <Phone className="w-3 h-3" /> Gọi
-                      </button>
-                    )}
-                    <a
-                      href="/inbox"
-                      className="p-1.5 text-slate-500 hover:text-[#DC2626] hover:bg-red-50 rounded-lg inline-flex items-center"
-                      title="Mở chat tư vấn"
-                    >
-                      <MessageSquare className="w-4 h-4" />
-                    </a>
+              {filteredData.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="p-8 text-center text-slate-400">
+                    Không tìm thấy khách hàng tư vấn nào phù hợp.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredData.map((row, index) => (
+                  <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
+                    {/* CỘT 1: STT */}
+                    <td className="px-3 py-4 text-center font-bold text-slate-500">
+                      {index + 1}
+                    </td>
+
+                    {/* CỘT 2: KHÁCH HÀNG */}
+                    <td className="px-4 py-4">
+                      <div className="font-bold text-slate-900 text-sm">
+                        {row.customerName}
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        Tiếp nhận: {row.receivedAt}
+                      </span>
+                    </td>
+
+                    {/* CỘT 3: SDT (TỰ ĐỘNG CẬP NHẬT TRONG QUÁ TRÌNH TƯ VẤN) */}
+                    <td className="px-4 py-4">
+                      {row.phone ? (
+                        <div className="space-y-1">
+                          <span className="font-mono font-bold text-slate-900 text-sm block">
+                            {row.phone}
+                          </span>
+                          {row.phoneAutoExtracted ? (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
+                              AI tự động lưu từ chat
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-slate-400">Đã xác thực</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                          <Clock className="w-3 h-3 text-amber-600" />
+                          AI đang xin số...
+                        </span>
+                      )}
+                    </td>
+
+                    {/* CỘT 4: KHÓA HỌC THAM KHẢO */}
+                    <td className="px-4 py-4">
+                      <span className="px-2.5 py-1 bg-red-50 text-[#DC2626] font-bold rounded-lg border border-red-100 text-xs inline-block">
+                        {row.courseRefLabel}
+                      </span>
+                    </td>
+
+                    {/* CỘT 5: NHU CẦU (TỰ ĐỘNG XÁC ĐỊNH TỪ ĐOẠN TIN NHẮN) */}
+                    <td className="px-5 py-4">
+                      <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                        <div className="flex items-center gap-1 text-[10px] font-bold text-[#DC2626]">
+                          <Bot className="w-3 h-3 text-[#DC2626]" />
+                          <span>AI Nhận Diện Nhu Cầu:</span>
+                        </div>
+                        <p className="text-slate-800 leading-relaxed font-medium">
+                          "{row.aiExtractedNeed}"
+                        </p>
+                      </div>
+                    </td>
+
+                    {/* CỘT 6: TÌNH TRẠNG CHĂM SÓC */}
+                    <td className="px-4 py-4">
+                      <select
+                        value={row.careStatus}
+                        onChange={(e) => handleStatusChange(row.id, e.target.value as any)}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
+                          row.careStatus === "registered"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-300 ring-1 ring-emerald-300"
+                            : row.careStatus === "trial_scheduled"
+                            ? "bg-indigo-50 text-indigo-800 border-indigo-200"
+                            : row.careStatus === "uncalled"
+                            ? "bg-red-50 text-[#DC2626] border-red-200 font-black animate-pulse"
+                            : "bg-white text-slate-800 border-slate-200"
+                        }`}
+                      >
+                        <option value="consulting">Đang tư vấn</option>
+                        <option value="called">Đã gọi tư vấn</option>
+                        <option value="uncalled">Chưa gọi (Cần liên hệ)</option>
+                        <option value="trial_scheduled">Hẹn học thử</option>
+                        <option value="registered">Đã đăng ký</option>
+                        <option value="lost">Không tiếp tục</option>
+                      </select>
+                    </td>
+
+                    {/* CỘT 7: ELEARNING (TỰ ĐỘNG CHUYỂN KHI ĐÃ ĐĂNG KÝ) */}
+                    <td className="px-4 py-4">
+                      {row.elearningStatus === "synced" ? (
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            Đã chuyển E-learning
+                          </span>
+                          <div className="text-[10px] text-slate-600 font-semibold flex items-center gap-1">
+                            <GraduationCap className="w-3 h-3 text-emerald-700" />
+                            <span>{row.elearningClass || "Chờ xếp lớp K26"}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-slate-400 text-[11px]">
+                          <span>Chưa chuyển</span>
+                          <div className="text-[10px] text-slate-400">
+                            (Tự động chuyển khi Đã đăng ký)
+                          </div>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Thao tác */}
+                    <td className="px-4 py-4 text-right space-x-1.5">
+                      {row.phone && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenCall(row)}
+                          className="px-2.5 py-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs"
+                          title="Gọi tư vấn"
+                        >
+                          <Phone className="w-3 h-3" /> Gọi
+                        </button>
+                      )}
+                      <a
+                        href="/inbox"
+                        className="p-1.5 text-slate-500 hover:text-[#DC2626] hover:bg-red-50 rounded-lg inline-flex items-center"
+                        title="Mở chat tư vấn"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                      </a>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

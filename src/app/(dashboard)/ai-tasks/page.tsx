@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import {
   Cpu,
@@ -8,21 +8,17 @@ import {
   Play,
   CheckCircle2,
   Clock,
-  MessageSquare,
   Sparkles,
-  Bell,
   Trash2,
-  Calendar,
-  Gift,
   X,
-  Save,
-  Check,
   Send,
   Zap,
   Bot,
+  RefreshCw,
+  Check,
 } from "lucide-react";
 
-interface AiTaskItem {
+export interface AiTaskItem {
   id: string;
   title: string;
   triggerEvent: string;
@@ -34,107 +30,146 @@ interface AiTaskItem {
   lastExecutedTime: string;
 }
 
-const initialTasks: AiTaskItem[] = [
-  {
-    id: "task-1",
-    title: "Tự động nhắn tin nhắc lịch học thử trước 24h",
-    triggerEvent: "Khi trạng thái là 'Hẹn học thử' và trước giờ hẹn 24 giờ",
-    channel: "Đa kênh (FB & Zalo)",
-    frequency: "Tự động quét mỗi 30 phút",
-    templateMessage:
-      "Dạ em An An xin phép nhắc Mẹ lịch hẹn học thử của bé tại Học viện T.A Academy vào lúc {gio_hen} ngày mai {ngay_hen} ạ. Mẹ cho bé mặc trang phục thoải mái để con tự tin tập dáng đi nha Mẹ!",
-    isActive: true,
-    totalExecutedCount: 148,
-    lastExecutedTime: "Hôm nay 10:00",
-  },
-  {
-    id: "task-2",
-    title: "Tự động nhắn tin hỏi thăm sau 48h khách không phản hồi",
-    triggerEvent: "Khách đã xem học phí nhưng im lặng quá 48 tiếng",
-    channel: "Facebook Messenger",
-    frequency: "Tự động chạy lúc 14:00 hàng ngày",
-    templateMessage:
-      "Dạ Mẹ ơi, em An An gửi thông tin học phí khóa Model Kids hôm trước không biết Mẹ đã xem qua chưa ạ? Nếu Mẹ còn phân vân về thời gian học hay đưa đón bé, em luôn sẵn sàng hỗ trợ sắp xếp lịch thuận tiện nhất cho Mẹ nha!",
-    isActive: true,
-    totalExecutedCount: 86,
-    lastExecutedTime: "Hôm nay 14:00",
-  },
-  {
-    id: "task-3",
-    title: "Tự động gửi cẩm nang trang phục & Chào mừng khi Đã đăng ký",
-    triggerEvent: "Khách hàng chuyển trạng thái 'Đã đăng ký (E-learning)'",
-    channel: "Zalo OA",
-    frequency: "Kích hoạt tức thì ngay khi chốt đơn",
-    templateMessage:
-      "Chúc mừng Chị và bé đã chính thức trở thành học viên của T.A Academy! Em An An gửi Chị Cẩm nang hướng dẫn chuẩn bị trang phục và lộ trình buổi học đầu tiên tại đây nhé ạ...",
-    isActive: true,
-    totalExecutedCount: 42,
-    lastExecutedTime: "Hôm qua 16:35",
-  },
-  {
-    id: "task-4",
-    title: "Tự động chúc mừng sinh nhật bé & Tặng suất trải nghiệm",
-    triggerEvent: "Đến ngày sinh nhật của học viên (quét từ hồ sơ)",
-    channel: "Đa kênh (FB & Zalo)",
-    frequency: "Quét 08:30 sáng hàng ngày",
-    templateMessage:
-      "Học viện T.A Academy thương chúc bé yêu sinh nhật vui vẻ, luôn tự tin tỏa sáng như một ngôi sao nhỏ! T.A gửi tặng Mẹ voucher ưu đãi 15% khóa học tiếp theo của con nha!",
-    isActive: true,
-    totalExecutedCount: 65,
-    lastExecutedTime: "28/10/2026",
-  },
-];
-
 export default function AiTasksAutomationPage() {
-  const [tasks, setTasks] = useState<AiTaskItem[]>(initialTasks);
+  const [tasks, setTasks] = useState<AiTaskItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [testRunSuccess, setTestRunSuccess] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Form thêm Task mới
   const [newTitle, setNewTitle] = useState("");
-  const [newTrigger, setNewTrigger] = useState("Khi khách hẹn học thử");
+  const [newTrigger, setNewTrigger] = useState("Trước giờ hẹn học thử 24 giờ");
   const [newChannel, setNewChannel] = useState<AiTaskItem["channel"]>("Đa kênh (FB & Zalo)");
   const [newTemplate, setNewTemplate] = useState("");
 
-  const handleToggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, isActive: !t.isActive } : t))
-    );
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleDeleteTask = (id: string) => {
-    setTasks(tasks.filter((t) => t.id !== id));
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/ai-tasks");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setTasks(json.data);
+        }
+      }
+    } catch (err) {
+      console.error("Lỗi tải tác vụ AI:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCreateTask = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const handleToggleTask = async (id: string) => {
+    try {
+      const res = await fetch("/api/ai-tasks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, isActive: json.data.isActive } : t))
+        );
+        showToast(json.message);
+      }
+    } catch (err) {
+      alert("Lỗi kết nối máy chủ");
+    }
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa tác vụ AI tự động này?")) return;
+
+    try {
+      const res = await fetch(`/api/ai-tasks?id=${id}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setTasks((prev) => prev.filter((t) => t.id !== id));
+        showToast("Đã xóa tác vụ AI thành công");
+      }
+    } catch (err) {
+      alert("Lỗi xóa tác vụ");
+    }
+  };
+
+  const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim() || !newTemplate.trim()) return;
 
-    const created: AiTaskItem = {
-      id: `task-${Date.now()}`,
-      title: newTitle,
-      triggerEvent: newTrigger,
-      channel: newChannel,
-      frequency: "Tự động kích hoạt khi thỏa điều kiện",
-      templateMessage: newTemplate,
-      isActive: true,
-      totalExecutedCount: 0,
-      lastExecutedTime: "Chưa chạy",
-    };
+    try {
+      const res = await fetch("/api/ai-tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newTitle.trim(),
+          triggerEvent: newTrigger,
+          channel: newChannel,
+          frequency: "Tự động quét khi thỏa điều kiện",
+          templateMessage: newTemplate.trim(),
+          isActive: true,
+        }),
+      });
 
-    setTasks([created, ...tasks]);
-    setIsAddModalOpen(false);
-    setNewTitle("");
-    setNewTemplate("");
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Lỗi tạo tác vụ");
+      }
+
+      setTasks([json.data, ...tasks]);
+      setIsAddModalOpen(false);
+      setNewTitle("");
+      setNewTemplate("");
+      showToast("Đã thêm Task công việc mới cho AI thành công!");
+    } catch (err: any) {
+      alert(err.message || "Có lỗi xảy ra");
+    }
   };
 
-  const handleRunTest = (task: AiTaskItem) => {
-    setTestRunSuccess(task.title);
-    setTimeout(() => setTestRunSuccess(null), 3000);
+  const handleRunTest = async (task: AiTaskItem) => {
+    try {
+      const res = await fetch("/api/ai-tasks/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: task.id }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === task.id ? { ...t, ...json.data } : t))
+        );
+        setTestRunSuccess(task.title);
+        setTimeout(() => setTestRunSuccess(null), 4000);
+      }
+    } catch (err) {
+      alert("Lỗi thực thi chạy thử");
+    }
   };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="fixed top-5 right-5 z-50 bg-[#DC2626] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-bold animate-in fade-in slide-in-from-top-3 duration-200">
+          <Check className="w-4 h-4" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* 1. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -148,20 +183,32 @@ export default function AiTasksAutomationPage() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-all active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          Thêm Task Công Việc Mới Cho AI
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={fetchTasks}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-xs"
+            title="Làm mới"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span>Làm mới</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-all active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            Thêm Task Công Việc Mới Cho AI
+          </button>
+        </div>
       </div>
 
       {testRunSuccess && (
         <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-xs animate-in fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span>Đã chạy thử nghiệm thành công Task: <strong>{testRunSuccess}</strong>! Tin nhắn mẫu đã được gửi kiểm thử.</span>
+          <span>Đã chạy thử nghiệm thành công Task: <strong>{testRunSuccess}</strong>! AI đã kích hoạt gửi tin nhắn tự động theo mẫu.</span>
         </div>
       )}
 
