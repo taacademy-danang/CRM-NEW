@@ -187,17 +187,23 @@ export function extractCustomerInsights(
   };
 }
 
-// 1. LẤY DANH SÁCH HỘI THOẠI (KẾT HỢP DỮ LIỆU THỰC TỪ FACEBOOK GRAPH API)
+export function clearAllInboxData() {
+  mockConversations = [];
+  mockMessagesDb = {};
+}
+
+// 1. LẤY DANH SÁCH HỘI THOẠI
 export async function getInboxConversations(params?: {
   channel?: string;
   search?: string;
   mode?: string;
+  sync?: boolean;
 }) {
   const config = getAiConfig();
   const fbToken = config.fbToken || process.env.FB_PAGE_ACCESS_TOKEN;
 
-  // Đồng bộ hội thoại thực tế từ Fanpage Facebook nếu có token hợp lệ
-  if (fbToken && fbToken.startsWith("EA")) {
+  // Chỉ đồng bộ từ Facebook Graph API khi người dùng chủ động yêu cầu (sync = true)
+  if (params?.sync && fbToken && fbToken.startsWith("EA")) {
     try {
       const fbRes = await fetch(
         `https://graph.facebook.com/v19.0/me/conversations?fields=id,snippet,updated_time,participants,unread_count,messages.limit(50){id,message,from,created_time}&limit=25&access_token=${fbToken}`,

@@ -28,12 +28,12 @@ import {
 export default function DashboardPage() {
   const [uncalledLeads, setUncalledLeads] = useState<Customer[]>([]);
   const [stats, setStats] = useState({
-    total_customers: 1280,
-    new_today: 42,
-    uncalled_count: 3,
-    consulting_count: 96,
-    need_care_count: 34,
-    registered_count: 145,
+    total_customers: 0,
+    new_today: 0,
+    uncalled_count: 0,
+    consulting_count: 0,
+    need_care_count: 0,
+    registered_count: 0,
   });
   const [loading, setLoading] = useState(true);
   const [selectedCustomerForCall, setSelectedCustomerForCall] = useState<Customer | null>(null);
@@ -414,59 +414,46 @@ export default function DashboardPage() {
               <Calendar className="w-4 h-4 text-[#DC2626]" />
               Công Việc Cần Xử Lý Hôm Nay
             </h3>
-            <span className="text-[11px] font-semibold text-slate-500">6 đầu việc</span>
+            <span className="text-[11px] font-semibold text-slate-500">
+              {uncalledLeads.length} đầu việc
+            </span>
           </div>
 
           <div className="space-y-2.5">
-            {[
-              {
-                title: "Gọi lại cho phụ huynh bé Hoàng Kiều Trinh (Hẹn 15:30)",
-                type: "call",
-                urgent: true,
-                course: "Catwalk",
-              },
-              {
-                title: "Chăm sóc 3 phụ huynh lớp Model Kids sau buổi học thử hôm qua",
-                type: "care",
-                urgent: false,
-                course: "Model Kids",
-              },
-              {
-                title: "Kiểm tra danh sách 5 học viên đã đăng ký đã xếp lớp E-learning K26",
-                type: "elearning",
-                urgent: false,
-                course: "Phong Thái",
-              },
-              {
-                title: "Xử lý 2 hội thoại AI vừa yêu cầu chuyển nhân viên tư vấn",
-                type: "ai_transfer",
-                urgent: true,
-                course: "Đa khóa học",
-              },
-            ].map((task, idx) => (
-              <div
-                key={idx}
-                className="p-3 bg-slate-50 hover:bg-red-50/30 rounded-xl border border-slate-200/80 flex items-center justify-between gap-3 text-xs transition-colors"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-800">{task.title}</span>
-                    {task.urgent && (
-                      <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">
-                        Gấp
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[11px] text-slate-500">Khóa học: {task.course}</span>
-                </div>
-                <a
-                  href="/consultations"
-                  className="p-1.5 text-slate-400 hover:text-[#DC2626] rounded"
-                >
-                  <ArrowRight className="w-4 h-4" />
-                </a>
+            {uncalledLeads.length === 0 ? (
+              <div className="p-6 text-center text-slate-400 text-xs">
+                Hiện không có công việc tồn đọng. Hệ thống sẵn sàng tiếp nhận khách hàng mới.
               </div>
-            ))}
+            ) : (
+              uncalledLeads.slice(0, 5).map((lead) => (
+                <div
+                  key={lead.id}
+                  className="p-3 bg-slate-50 hover:bg-red-50/30 rounded-xl border border-slate-200/80 flex items-center justify-between gap-3 text-xs transition-colors"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-800">
+                        Liên hệ tư vấn cho khách hàng {lead.full_name}
+                      </span>
+                      {lead.sla_alert_level === "danger_60m" && (
+                        <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">
+                          Gấp
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-slate-500">
+                      SĐT: {lead.phone} • Chờ: {lead.waiting_minutes} phút
+                    </span>
+                  </div>
+                  <a
+                    href="/consultations"
+                    className="p-1.5 text-slate-400 hover:text-[#DC2626] rounded"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -483,54 +470,9 @@ export default function DashboardPage() {
           </div>
 
           <div className="space-y-3">
-            {[
-              {
-                time: "14:32",
-                actor: "AI An An",
-                action: "Tự động trích xuất và cập nhật SĐT khách hàng: 0988123456",
-                type: "ai",
-              },
-              {
-                time: "14:28",
-                actor: "Trần Văn Bình",
-                action: "Xác nhận cuộc gọi tư vấn thành công với phụ huynh Nguyễn Hoàng Nam (3m 45s)",
-                type: "human",
-              },
-              {
-                time: "14:15",
-                actor: "Hệ thống",
-                action: "Tự động đồng bộ học viên Vũ Mai Phương sang E-learning lớp Phong Thái K26",
-                type: "system",
-              },
-              {
-                time: "13:50",
-                actor: "Nguyễn Thị Lan",
-                action: "Bàn giao hồ sơ khách hàng Hoàng Kiều Trinh cho nhân viên Lê Minh Trang",
-                type: "human",
-              },
-            ].map((log, idx) => (
-              <div key={idx} className="flex items-start gap-3 text-xs">
-                <span className="font-mono text-slate-400 text-[11px] shrink-0 pt-0.5">
-                  {log.time}
-                </span>
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${
-                        log.type === "ai"
-                          ? "bg-purple-100 text-purple-700"
-                          : log.type === "system"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-red-100 text-[#DC2626]"
-                      }`}
-                    >
-                      {log.actor}
-                    </span>
-                  </div>
-                  <p className="text-slate-700 text-xs">{log.action}</p>
-                </div>
-              </div>
-            ))}
+            <div className="p-6 text-center text-slate-400 text-xs">
+              Hệ thống AI Tiểu Mỹ đang trực tuyến và sẵn sàng ghi nhận hoạt động tự động 24/7.
+            </div>
           </div>
         </div>
       </div>

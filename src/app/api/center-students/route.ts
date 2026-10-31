@@ -5,6 +5,7 @@ import {
   addCenterStudent,
   updateCenterStudent,
   deleteCenterStudent,
+  clearAllCenterStudents,
 } from "@/lib/services/consultationService";
 
 export async function GET(req: NextRequest) {
@@ -77,6 +78,16 @@ export async function DELETE(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const id = searchParams.get("id");
+    const clearAll = searchParams.get("all") === "true";
+
+    if (clearAll) {
+      clearAllCenterStudents();
+      return NextResponse.json({
+        success: true,
+        message: "Đã xóa sạch toàn bộ danh sách học viên trung tâm!",
+      });
+    }
+
     if (!id) throw new Error("Thiếu ID học viên");
 
     deleteCenterStudent(id);

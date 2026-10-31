@@ -23,6 +23,8 @@ import {
   ChevronRight,
   User,
   Zap,
+  Trash2,
+  MessageSquare,
 } from "lucide-react";
 import { AiConversationMode } from "@/types/inbox";
 
@@ -56,7 +58,7 @@ interface MessageItem {
 
 export default function InboxPage() {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
-  const [activeConvId, setActiveConvId] = useState<string>("conv-1");
+  const [activeConvId, setActiveConvId] = useState<string>("");
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [filterChannel, setFilterChannel] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,21 +78,30 @@ export default function InboxPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  const [syncing, setSyncing] = useState(false);
+
   // 1. Tải danh sách hội thoại
-  const fetchConversations = async () => {
+  const fetchConversations = async (sync = false) => {
     try {
-      setLoadingConv(true);
+      if (sync) setSyncing(true);
+      else setLoadingConv(true);
       const params = new URLSearchParams();
       if (filterChannel !== "all") params.set("channel", filterChannel);
       if (searchTerm) params.set("search", searchTerm);
+      if (sync) params.set("sync", "true");
 
       const res = await fetch(`/api/inbox/conversations?${params.toString()}`);
       if (res.ok) {
         const json = await res.json();
-        if (json.success && json.data.length > 0) {
-          setConversations(json.data);
-          if (!activeConvId || !json.data.some((c: any) => c.id === activeConvId)) {
-            setActiveConvId(json.data[0].id);
+        if (json.success) {
+          setConversations(json.data || []);
+          if (json.data && json.data.length > 0) {
+            if (!activeConvId || !json.data.some((c: any) => c.id === activeConvId)) {
+              setActiveConvId(json.data[0].id);
+            }
+          } else {
+            setActiveConvId("");
+            setMessages([]);
           }
         }
       }
@@ -98,6 +109,20 @@ export default function InboxPage() {
       console.error("Lỗi tải hội thoại:", err);
     } finally {
       setLoadingConv(false);
+      setSyncing(false);
+    }
+  };
+
+  const handleClearInbox = async () => {
+    if (!confirm("Bạn có chắc chắn muốn xóa sạch toàn bộ hội thoại trong hộp thư?")) return;
+    try {
+      await fetch("/api/inbox/conversations", { method: "DELETE" });
+      setConversations([]);
+      setActiveConvId("");
+      setMessages([]);
+      showToast("Đã xóa sạch hộp thư tư vấn thành công!");
+    } catch {
+      alert("Lỗi khi xóa hộp thư");
     }
   };
 
@@ -332,9 +357,29 @@ export default function InboxPage() {
           <div className="p-3.5 border-b border-slate-200 space-y-2 bg-white">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-slate-900">Hội thoại tư vấn</h2>
-              <span className="px-2 py-0.5 text-[11px] font-bold bg-red-100 text-[#DC2626] rounded-full">
-                {conversations.length} khách
-              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => fetchConversations(true)}
+                  disabled={syncing}
+                  className="px-2 py-0.5 text-[10px] font-bold text-[#DC2626] bg-red-50 hover:bg-red-100 rounded-lg flex items-center gap-1 transition-colors"
+                  title="Đồng bộ tin nhắn mới từ Fanpage"
+                >
+                  <RefreshCw className={`w-3 h-3 ${syncing ? "animate-spin" : ""}`} />
+                  Đồng bộ
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearInbox}
+                  className="p-1 text-slate-400 hover:text-red-600 rounded transition-colors"
+                  title="Xóa sạch hộp thư"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+                <span className="px-2 py-0.5 text-[11px] font-bold bg-slate-100 text-slate-700 rounded-full">
+                  {conversations.length}
+                </span>
+              </div>
             </div>
 
             <div className="relative">
@@ -387,7 +432,12 @@ export default function InboxPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
-            {conversations.map((c) => {
+            {conversations.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs">
+                Chưa có tin nhắn nào. Hệ thống sẵn sàng tiếp nhận hội thoại từ khách hàng.
+              </div>
+            ) : (
+              conversations.map((c) => {
               const isActive = c.id === activeConv?.id;
               return (
                 <div
@@ -452,11 +502,23 @@ export default function InboxPage() {
                   </div>
                 </div>
               );
-            })}
+            }))}
           </div>
         </div>
 
         {/* CỘT 2: CỬA SỔ CHAT CHÍNH (FLEX-1) */}
+        {!activeConv && (
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-xs p-8 text-center bg-white">
+            <div className="w-16 h-16 rounded-3xl bg-red-50 text-[#DC2626] flex items-center justify-center mb-3">
+              <MessageSquare className="w-8 h-8" />
+            </div>
+            <p className="font-bold text-slate-800 text-sm">Hộp thư tư vấn đang sẵn sàng</p>
+            <p className="max-w-sm mt-1 text-slate-500">
+              Chưa có hội thoại nào được chọn hoặc đang chờ tin nhắn mới từ phụ huynh trên Facebook Messenger / Zalo OA.
+            </p>
+          </div>
+        )}
+
         {activeConv && (
           <div className="flex-1 flex flex-col bg-white">
             {/* Header chat & Bộ điều khiển AI */}

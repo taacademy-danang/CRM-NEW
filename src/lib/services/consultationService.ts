@@ -303,3 +303,12 @@ export function deleteCenterStudent(id: string) {
   mockCenterStudents.splice(index, 1);
   return { success: true };
 }
+
+export function clearAllConsultations() {
+  mockConsultations = [];
+}
+
+export function clearAllCenterStudents() {
+  mockCenterStudents = [];
+  studentCounter = 1;
+}

@@ -6,6 +6,7 @@ import {
   addConsultation,
   updateConsultation,
   deleteConsultation,
+  clearAllConsultations,
 } from "@/lib/services/consultationService";
 
 export const dynamic = "force-dynamic";
@@ -128,6 +129,16 @@ export async function DELETE(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const id = searchParams.get("id");
+    const clearAll = searchParams.get("all") === "true";
+
+    if (clearAll) {
+      clearAllConsultations();
+      return NextResponse.json({
+        success: true,
+        message: "Đã xóa sạch toàn bộ danh sách khách hàng tư vấn!",
+      });
+    }
+
     if (!id) throw new Error("Thiếu ID khách hàng");
 
     deleteConsultation(id);

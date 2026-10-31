@@ -246,8 +246,12 @@ export default function AiTasksAutomationPage() {
           </div>
           <div>
             <span className="text-xs text-slate-500 font-medium">Tỷ lệ phụ huynh phản hồi</span>
-            <div className="text-2xl font-black text-purple-700">76.4%</div>
-            <span className="text-[11px] text-purple-600 font-bold">Giảm 60% tỷ lệ hủy lịch học thử</span>
+            <div className="text-2xl font-black text-purple-700">
+              {tasks.length > 0 ? "76.4%" : "0%"}
+            </div>
+            <span className="text-[11px] text-purple-600 font-bold">
+              {tasks.length > 0 ? "Giảm 60% tỷ lệ hủy lịch học thử" : "Sẵn sàng phân tích khi có tác vụ"}
+            </span>
           </div>
         </div>
       </div>
@@ -260,8 +264,19 @@ export default function AiTasksAutomationPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {tasks.map((task) => (
+        {tasks.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3 shadow-xs">
+            <div className="w-12 h-12 bg-red-50 text-[#DC2626] rounded-2xl flex items-center justify-center mx-auto">
+              <Bot className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-slate-800 text-sm">Chưa có tác vụ AI tự động nào</h3>
+            <p className="text-slate-500 text-xs max-w-md mx-auto">
+              Dữ liệu giả đã được xóa sạch. Bạn có thể bấm nút &quot;Thêm Task Công Việc Mới Cho AI&quot; ở trên để thiết lập quy trình tự động gửi tin nhắn nhắc lịch học thử, chăm sóc khách hàng hoặc gửi ưu đãi.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {tasks.map((task) => (
             <div
               key={task.id}
               className={`p-5 rounded-2xl border transition-all space-y-3.5 bg-white ${
@@ -353,6 +368,7 @@ export default function AiTasksAutomationPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Modal Thêm Task Công Việc Mới Cho AI */}
