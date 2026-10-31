@@ -113,9 +113,9 @@ let mockMessagesDb: Record<string, Message[]> = {
       id: "m-1-2",
       conversation_id: "conv-1",
       sender_type: "ai",
-      sender_name: "AI An An (T.A Academy)",
+      sender_name: "Tiểu Mỹ (T.A Academy)",
       content:
-        "Dạ em An An xin chào Chị Hương ạ! Rất vui được đồng hành cùng Chị và con. Chị cho em hỏi bé nhà mình năm nay được mấy tuổi rồi ạ? Mong muốn lớn nhất của Chị khi cho con tham gia lớp học là gì ha Chị?",
+        "Dạ em Tiểu Mỹ xin chào Chị Hương ạ! Rất vui được đồng hành cùng Chị và con. Chị cho em hỏi bé nhà mình năm nay được mấy tuổi rồi ạ? Mong muốn lớn nhất của Chị khi cho con tham gia lớp học là gì ha Chị? 😊",
       is_internal_note: false,
       status: "delivered",
       created_at: "14:29",
@@ -322,13 +322,13 @@ export function generateAiResponse(conversationId: string, isCopilot = false) {
   const lowerMsg = lastCustomerMessage.toLowerCase();
 
   if (lowerMsg.includes("học thử") || lowerMsg.includes("lịch học")) {
-    replyText = `Dạ em An An xin gửi Mẹ lịch học thử trải nghiệm miễn phí khóa ${conversation.course} vào Thứ 7 (09:00 - 10:30) hoặc Chủ Nhật (15:00 - 16:30) tuần này ạ. Mẹ đăng ký ca nào để em giữ chỗ và chuẩn bị giáo cụ tốt nhất cho con nhé?`;
+    replyText = `Dạ em Tiểu Mỹ xin gửi Mẹ lịch học thử trải nghiệm miễn phí khóa ${conversation.course} vào Thứ 7 (09:00 - 10:30) hoặc Chủ Nhật (15:00 - 16:30) tuần này ạ. Mẹ đăng ký ca nào để em giữ chỗ và chuẩn bị giáo cụ tốt nhất cho con nhé? ✨`;
   } else if (lowerMsg.includes("học phí") || lowerMsg.includes("giá")) {
     replyText = `Dạ khóa ${conversation.course} tại T.A Academy có lộ trình chuẩn 12 buổi học trực tiếp cùng chuyên gia phong thái, học phí niêm yết là 6.500.000đ. Đang có ưu đãi đặc quyền tặng 1 buổi định hình dáng đi cá nhân nếu Mẹ đăng ký trong tuần này ạ!`;
   } else if (lowerMsg.includes("địa chỉ") || lowerMsg.includes("ở đâu")) {
-    replyText = `Dạ trụ sở chính Học viện T.A Academy tại Toà nhà Landmark, Quận 1, TP.HCM ạ. Học viện có bãi đỗ xe ô tô và sảnh đón phụ huynh rất tiện lợi. Em xin phép đón Mẹ và bé đến tham quan lớp học vào ngày gần nhất nha Mẹ!`;
+    replyText = `Dạ trụ sở chính Học viện T.A Academy tại Toà nhà Landmark, Quận 1, TP.HCM ạ. Học viện có bãi đỗ xe ô tô và sảnh đón phụ huynh rất tiện lợi. Em xin phép đón Mẹ và bé đến tham quan lớp học vào ngày gần nhất nha Mẹ! 🌸`;
   } else {
-    replyText = `Dạ em An An đã ghi nhận mong muốn của Chị về khóa ${conversation.course} cho bé. Để tư vấn lộ trình phù hợp nhất với thể trạng và tính cách của con, Chị cho em xin số điện thoại để chuyên viên tư vấn gọi điện gửi ảnh lớp học trực quan cho Chị nha!`;
+    replyText = `Dạ em Tiểu Mỹ đã ghi nhận mong muốn của Chị về khóa ${conversation.course} cho bé. Để tư vấn lộ trình phù hợp nhất với thể trạng và tính cách của con, Chị cho em xin số điện thoại để chuyên viên tư vấn gọi điện gửi ảnh lớp học trực quan cho Chị nha! 😊`;
   }
 
   if (isCopilot) {
@@ -344,7 +344,7 @@ export function generateAiResponse(conversationId: string, isCopilot = false) {
     conversationId,
     content: replyText,
     senderType: "ai",
-    senderName: "AI An An (T.A Academy)",
+    senderName: "Tiểu Mỹ (T.A Academy)",
   });
 }
 
@@ -451,18 +451,18 @@ export function handleIncomingFacebookMessage(data: {
 
   if (conversation.aiMode === "ai_auto") {
     if (lowerMsg.includes("học thử") || lowerMsg.includes("trải nghiệm")) {
-      aiReplyText = `Dạ em An An xin chào ${senderName}! Em rất vui được hỗ trợ Chị tìm hiểu khóa ${conversation.course}. Cuối tuần này (Thứ 7 lúc 09:00 hoặc Chủ Nhật lúc 15:00) học viện có tổ chức lớp học thử trải nghiệm miễn phí ạ. Chị cho em xin số điện thoại để em giữ chỗ và chuẩn bị trang phục cho con nha!`;
+      aiReplyText = `Dạ em Tiểu Mỹ xin chào ${senderName}! Em rất vui được hỗ trợ Chị tìm hiểu khóa ${conversation.course}. Cuối tuần này (Thứ 7 lúc 09:00 hoặc Chủ Nhật lúc 15:00) học viện có tổ chức lớp học thử trải nghiệm miễn phí ạ. Chị cho em xin số điện thoại để em giữ chỗ và chuẩn bị trang phục cho con nha! ✨`;
     } else if (lowerMsg.includes("học phí") || lowerMsg.includes("bao nhiêu tiền") || lowerMsg.includes("giá")) {
-      aiReplyText = `Dạ học phí chính thức khóa ${conversation.course} tại T.A Academy được đào tạo trực tiếp cùng các chuyên gia hàng đầu. Trong tuần này học viện đang có ưu đãi đặc quyền tặng kèm 1 buổi định hình phong thái cá nhân khi đăng ký giữ chỗ sớm ạ!`;
+      aiReplyText = `Dạ học phí chính thức khóa ${conversation.course} tại T.A Academy được đào tạo trực tiếp cùng các chuyên gia hàng đầu. Trong tuần này học viện đang có ưu đãi đặc quyền tặng kèm 1 buổi định hình phong thái cá nhân khi đăng ký giữ chỗ sớm ạ! 🌸`;
     } else {
-      aiReplyText = `Dạ em An An (T.A Academy) đã nhận được tin nhắn từ ${senderName} ạ! Với khóa ${conversation.course}, giảng viên sẽ kèm cặp sát sao để đạt kết quả tốt nhất. Chị cho em xin số điện thoại hoặc độ tuổi của bé để em tư vấn giáo trình chi tiết nhất cho mình nha!`;
+      aiReplyText = `Dạ em Tiểu Mỹ (T.A Academy) đã nhận được tin nhắn từ ${senderName} ạ! Với khóa ${conversation.course}, giảng viên sẽ kèm cặp sát sao để đạt kết quả tốt nhất. Chị cho em xin số điện thoại hoặc độ tuổi của bé để em tư vấn giáo trình chi tiết nhất cho mình nha! 😊`;
     }
 
     aiMessage = {
       id: `m-ai-${Date.now()}`,
       conversation_id: conversation.id,
       sender_type: "ai",
-      sender_name: "AI An An (T.A Academy)",
+      sender_name: "Tiểu Mỹ (T.A Academy)",
       content: aiReplyText,
       is_internal_note: false,
       status: "delivered",

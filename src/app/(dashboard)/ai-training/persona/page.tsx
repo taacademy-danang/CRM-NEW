@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/layout/Breadcrumb";
 import { Sparkles, Save, CheckCircle2, ShieldAlert, Check } from "lucide-react";
 
 export default function AiPersonaPage() {
-  const [assistantName, setAssistantName] = useState("Trợ lý An An");
+  const [assistantName, setAssistantName] = useState("Tiểu Mỹ");
   const [addressingStyle, setAddressingStyle] = useState("Em - Mẹ bé / Ba bé (hoặc Em - Chị / Anh)");
   const [tone, setTone] = useState("Tươi tắn, ân cần, chuyên nghiệp, thấu cảm, đậm chất phong thái");
   const [maxTokens, setMaxTokens] = useState(350);
@@ -91,7 +91,7 @@ export default function AiPersonaPage() {
       {saved && (
         <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2 animate-in fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          Đã lưu cập nhật Nhân cách &amp; Chỉ thị lõi cho AI An An thành công!
+          Đã lưu cập nhật Nhân cách &amp; Chỉ thị lõi cho Tiểu Mỹ thành công!
         </div>
       )}
 

@@ -600,7 +600,7 @@ export default function SettingsPage() {
                   </button>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Khi bật, AI An An sẽ tự động phân tích và phản hồi ngay lập tức cho phụ huynh nhắn tin vào Fanpage mà không cần nhân viên gõ tay.
+                  Khi bật, Tiểu Mỹ sẽ tự động phân tích và phản hồi ngay lập tức cho phụ huynh nhắn tin vào Fanpage mà không cần nhân viên gõ tay.
                 </p>
               </div>
 
@@ -640,7 +640,7 @@ export default function SettingsPage() {
                     BỘ THỬ NGHIỆM KẾT NỐI FANPAGE &amp; AI TƯ VẤN (LIVE TEST)
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Bắn tin nhắn giả lập từ khách hàng Facebook để kiểm tra toàn bộ luồng Webhook &rarr; Trích xuất SĐT &rarr; AI An An tư vấn tự động &rarr; Đồng bộ vào CRM
+                    Bắn tin nhắn giả lập từ khách hàng Facebook để kiểm tra toàn bộ luồng Webhook &rarr; Trích xuất SĐT &rarr; Tiểu Mỹ tư vấn tự động &rarr; Đồng bộ vào CRM
                   </p>
                 </div>
               </div>
@@ -692,7 +692,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-emerald-700 font-bold text-xs">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Webhook Facebook đã tiếp nhận &amp; AI An An đã phản hồi thành công!</span>
+                    <span>Webhook Facebook đã tiếp nhận &amp; Tiểu Mỹ đã phản hồi thành công!</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <a
@@ -733,7 +733,7 @@ export default function SettingsPage() {
 
                   <div className="p-3 bg-red-50/50 rounded-xl border border-red-200 space-y-1.5">
                     <span className="font-bold text-[#DC2626] text-[11px] uppercase tracking-wider block flex items-center gap-1">
-                      <Bot className="w-3.5 h-3.5" /> Phản hồi từ AI An An (Gửi lại khách):
+                      <Bot className="w-3.5 h-3.5" /> Phản hồi từ Tiểu Mỹ (Gửi lại khách):
                     </span>
                     <p className="text-slate-800 italic leading-relaxed text-xs">
                       "{testWebhookResult.aiReply}"

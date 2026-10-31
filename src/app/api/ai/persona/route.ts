@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const updated = updateAiPersona(body);
     return NextResponse.json({
       success: true,
-      message: "Đã lưu nhân cách & System Prompt cho AI An An thành công!",
+      message: "Đã lưu nhân cách & System Prompt cho Tiểu Mỹ thành công!",
       data: updated,
     });
   } catch (error: any) {
