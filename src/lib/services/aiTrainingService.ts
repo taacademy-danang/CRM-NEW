@@ -16,6 +16,18 @@ export interface AiConfigData {
   fanpageStatus: "active" | "inactive";
 }
 
+export interface AiZaloConfigData {
+  oaId: string;
+  appId: string;
+  secretKey: string;
+  accessToken: string;
+  refreshToken?: string;
+  webhookUrl: string;
+  isBotActive: boolean;
+  lastTestedAt: string;
+  status: "connected" | "pending" | "error";
+}
+
 export interface AiPersonaData {
   assistantName: string;
   addressingStyle: string;
@@ -69,6 +81,18 @@ let aiConfigStore: AiConfigData = {
   metaStatus: "connected",
   geminiStatus: "connected",
   fanpageStatus: "active",
+};
+
+let aiZaloConfigStore: AiZaloConfigData = {
+  oaId: "2489103984920194",
+  appId: "4820192840192",
+  secretKey: "zk_live_ta_academy_secret_key_prod",
+  accessToken: "zalo_oa_live_token_ta_academy_2026",
+  refreshToken: "zalo_oa_refresh_token_ta_academy",
+  webhookUrl: "https://crm.taacademy.vn/api/webhooks/zalo",
+  isBotActive: true,
+  lastTestedAt: "Hôm nay 09:15",
+  status: "connected",
 };
 
 let aiPersonaStore: AiPersonaData = {
@@ -262,6 +286,20 @@ export function updateAiConfig(data: Partial<AiConfigData>) {
     lastTestedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
   };
   return aiConfigStore;
+}
+
+// 1.1 CẤU HÌNH AI ZALO OA
+export function getAiZaloConfig() {
+  return { ...aiZaloConfigStore };
+}
+
+export function updateAiZaloConfig(data: Partial<AiZaloConfigData>) {
+  aiZaloConfigStore = {
+    ...aiZaloConfigStore,
+    ...data,
+    lastTestedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+  };
+  return aiZaloConfigStore;
 }
 
 // 2. NHÂN CÁCH AI (PERSONA)

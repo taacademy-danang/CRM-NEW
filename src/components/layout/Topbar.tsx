@@ -1,17 +1,45 @@
 "use client";
 
-import React from "react";
-import { Search, Bell, Sparkles, LogOut } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Bell, Sparkles, LogOut, ShieldCheck, UserCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Topbar() {
   const router = useRouter();
+  const [userName, setUserName] = useState("Nguyễn Thị Lan");
+  const [userRole, setUserRole] = useState("admin");
+  const [roleTitle, setRoleTitle] = useState("Quản trị hệ thống");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedAuth = localStorage.getItem("ta_crm_auth");
+        if (storedAuth) {
+          const parsed = JSON.parse(storedAuth);
+          if (parsed.name) setUserName(parsed.name);
+          if (parsed.role) setUserRole(parsed.role);
+          if (parsed.roleTitle) setRoleTitle(parsed.roleTitle);
+          else setRoleTitle(parsed.role === "admin" ? "Quản trị hệ thống" : "Lễ tân / Tư vấn viên");
+        }
+      } catch (e) {
+        console.error("Error parsing auth", e);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("ta_crm_auth");
     }
     router.push("/login");
+  };
+
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
   };
 
   return (
@@ -59,14 +87,19 @@ export default function Topbar() {
         {/* User Profile dropdown info */}
         <div className="flex items-center gap-3 pl-2 border-l border-slate-200">
           <div className="w-9 h-9 rounded-full bg-[#DC2626] text-white font-bold flex items-center justify-center text-xs shadow-xs">
-            NL
+            {getInitials(userName)}
           </div>
           <div className="hidden sm:flex flex-col text-left">
             <span className="text-xs font-bold text-slate-900 leading-tight">
-              Nguyễn Thị Lan
+              {userName}
             </span>
-            <span className="text-[11px] text-slate-500 font-medium">
-              Quản trị tuyển sinh
+            <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+              {userRole === "admin" ? (
+                <ShieldCheck className="w-3 h-3 text-emerald-600 inline" />
+              ) : (
+                <UserCheck className="w-3 h-3 text-amber-600 inline" />
+              )}
+              {roleTitle}
             </span>
           </div>
 

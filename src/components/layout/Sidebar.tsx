@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Mail,
@@ -13,6 +13,8 @@ import {
   ChevronDown,
   Sparkles,
   Flame,
+  ShieldCheck,
+  UserCheck,
 } from "lucide-react";
 import { MAIN_NAVIGATION, BRAND_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -28,7 +30,47 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [aiSubmenuOpen, setAiSubmenuOpen] = useState(true);
+  const [userRole, setUserRole] = useState<string>("admin");
+  const [userName, setUserName] = useState<string>("Quản trị viên");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedAuth = localStorage.getItem("ta_crm_auth");
+        if (storedAuth) {
+          const parsed = JSON.parse(storedAuth);
+          if (parsed.role) {
+            setUserRole(parsed.role);
+            setUserName(parsed.name || (parsed.role === "admin" ? "Quản trị viên" : "Lễ tân"));
+          }
+        }
+      } catch (e) {
+        console.error("Error reading auth state:", e);
+      }
+    }
+  }, []);
+
+  // Bảo vệ route cho Lễ tân: Nếu lễ tân vào /settings hoặc /ai-training thì chuyển về /
+  useEffect(() => {
+    if (userRole === "receptionist") {
+      if (pathname.startsWith("/ai-training") || pathname.startsWith("/settings")) {
+        router.replace("/");
+      }
+    }
+  }, [userRole, pathname, router]);
+
+  // Lọc menu theo phân quyền
+  const filteredNav = MAIN_NAVIGATION.filter((item) => {
+    if (userRole === "receptionist") {
+      // Lễ tân chỉ xem được: Tổng quan (/), Hộp thư tư vấn (/inbox), Quản lý khách hàng (/consultations), AI Tự động hóa tác vụ lặp lại (/ai-tasks)
+      const allowedPaths = ["/", "/inbox", "/consultations", "/ai-tasks"];
+      return allowedPaths.includes(item.href);
+    }
+    // Admin xem tất cả
+    return true;
+  });
 
   return (
     <aside className="w-64 bg-gradient-to-b from-[#DC2626] via-[#C81E2E] to-[#991B1B] text-white flex flex-col h-screen shrink-0 shadow-xl border-r border-red-700 select-none overflow-y-auto">
@@ -49,9 +91,32 @@ export default function Sidebar() {
         </div>
       </div>
 
+      {/* Role Pill Indicator */}
+      <div className="px-4 pt-3 pb-1">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/20 border border-white/10 text-white/90 text-xs">
+          {userRole === "admin" ? (
+            <>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+              <div className="flex flex-col">
+                <span className="font-bold text-[11px] leading-tight">Quản trị viên (Toàn quyền)</span>
+                <span className="text-[9px] text-white/70">{userName}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <UserCheck className="w-3.5 h-3.5 text-amber-300" />
+              <div className="flex flex-col">
+                <span className="font-bold text-[11px] leading-tight text-amber-100">Lễ tân (Giới hạn 4 tab)</span>
+                <span className="text-[9px] text-white/70">{userName}</span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
       {/* 2. Main Navigation Items */}
-      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
-        {MAIN_NAVIGATION.map((item) => {
+      <nav className="flex-1 px-3 py-3 space-y-1.5 overflow-y-auto">
+        {filteredNav.map((item) => {
           const Icon = iconMap[item.iconName] || LayoutDashboard;
           const isAiMenu = item.href === "/ai-training";
           const isActive = isAiMenu

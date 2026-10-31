@@ -27,12 +27,14 @@ export default function LoginPage() {
 
       // Lưu trạng thái đăng nhập
       if (typeof window !== "undefined") {
+        const isAdmin = email.toLowerCase().includes("admin");
         localStorage.setItem(
           "ta_crm_auth",
           JSON.stringify({
             email,
-            name: email.includes("admin") ? "Nguyễn Thị Lan" : "Trần Văn Bình",
-            role: email.includes("admin") ? "Quản trị hệ thống" : "Tư vấn viên",
+            name: isAdmin ? "Nguyễn Thị Lan" : "Trần Văn Bình",
+            role: isAdmin ? "admin" : "receptionist",
+            roleTitle: isAdmin ? "Quản trị viên (Admin)" : "Lễ tân / Tư vấn viên",
             token: "mock_jwt_session_token",
             loginAt: new Date().toISOString(),
           })
@@ -43,12 +45,12 @@ export default function LoginPage() {
     }, 600);
   };
 
-  const handleQuickLogin = (role: "admin" | "consultant") => {
+  const handleQuickLogin = (role: "admin" | "receptionist") => {
     if (role === "admin") {
       setEmail("admin@taacademy.vn");
       setPassword("12345678");
     } else {
-      setEmail("tuvan.binh@taacademy.vn");
+      setEmail("letan@taacademy.vn");
       setPassword("12345678");
     }
   };
@@ -169,16 +171,16 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleQuickLogin("admin")}
-                className="p-2 rounded-xl border border-slate-200 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                className="p-2.5 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-50 text-[11px] font-bold text-red-700 transition-colors text-center"
               >
-                Quản trị (Admin)
+                Quản trị viên (Admin)
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickLogin("consultant")}
-                className="p-2 rounded-xl border border-slate-200 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                onClick={() => handleQuickLogin("receptionist")}
+                className="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 transition-colors text-center"
               >
-                Tư vấn viên
+                Lễ tân (Receptionist)
               </button>
             </div>
           </div>

@@ -40,7 +40,7 @@ export const MAIN_NAVIGATION: NavigationItem[] = [
     badge: 12,
   },
   {
-    name: "Quản lý khách hàng tư vấn",
+    name: "Quản lý khách hàng",
     href: "/consultations",
     iconName: "Users",
   },
