@@ -82,7 +82,8 @@ export async function POST(req: NextRequest) {
 
     // 2. Nếu có Page Access Token thật và người dùng bật bot, gọi Meta Graph API gửi trả lời trực tiếp về Messenger
     let fbApiResponse = null;
-    if (config.fbToken && config.fbToken.startsWith("EA") && config.isBotActive) {
+    const replyContent = result.aiReply?.content;
+    if (replyContent && config.fbToken && config.fbToken.startsWith("EA") && config.isBotActive) {
       try {
         const fbRes = await fetch(
           `https://graph.facebook.com/v19.0/me/messages?access_token=${config.fbToken}`,
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               recipient: { id: senderId },
               messaging_type: "RESPONSE",
-              message: { text: result.aiReplyText },
+              message: { text: replyContent },
             }),
           }
         );
@@ -110,11 +111,10 @@ export async function POST(req: NextRequest) {
         senderId,
         senderName,
         messageText,
-        aiReply: result.aiReplyText,
-        extractedPhone: result.extractedPhone,
-        extractedNeed: result.extractedNeed,
+        aiReply: result.aiReply?.content || null,
+        extractedPhone: result.conversation.phone || null,
+        extractedNeed: result.conversation.aiExtractedNeed,
         conversationId: result.conversation.id,
-        syncedLead: result.syncedLead,
         fbApiResponse,
       },
     });

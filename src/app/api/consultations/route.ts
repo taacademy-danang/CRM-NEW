@@ -17,7 +17,11 @@ export async function GET(req: NextRequest) {
     const course = searchParams.get("course") || undefined;
     const status = searchParams.get("status") || undefined;
 
-    const data = getConsultations({ search, course, status });
+    const data = getConsultations({
+      search,
+      courseRef: course,
+      careStatus: status,
+    });
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
     return NextResponse.json(

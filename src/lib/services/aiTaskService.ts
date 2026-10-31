@@ -23,7 +23,7 @@ let mockTasks: AiTaskItem[] = [
     channel: "Đa kênh (FB & Zalo)",
     frequency: "Tự động quét mỗi 30 phút",
     templateMessage:
-      "Dạ em An An xin phép nhắc Mẹ lịch hẹn học thử của bé tại Học viện T.A Academy vào lúc {gio_hen} ngày mai {ngay_hen} ạ. Mẹ cho bé mặc trang phục thoải mái để con tự tin tập dáng đi nha Mẹ!",
+      "Dạ em Tiểu Mỹ xin phép nhắc Mẹ lịch hẹn học thử của bé tại Học viện T.A Academy vào lúc {gio_hen} ngày mai {ngay_hen} ạ. Mẹ cho bé mặc trang phục thoải mái để con tự tin tập dáng đi nha Mẹ!",
     isActive: true,
     totalExecutedCount: 148,
     lastExecutedTime: "Hôm nay 10:00",
@@ -35,7 +35,7 @@ let mockTasks: AiTaskItem[] = [
     channel: "Facebook Messenger",
     frequency: "Tự động chạy lúc 14:00 hàng ngày",
     templateMessage:
-      "Dạ Mẹ ơi, em An An gửi thông tin học phí khóa Model Kids hôm trước không biết Mẹ đã xem qua chưa ạ? Nếu Mẹ còn phân vân về thời gian học hay đưa đón bé, em luôn sẵn sàng hỗ trợ sắp xếp lịch thuận tiện nhất cho Mẹ nha!",
+      "Dạ Mẹ ơi, em Tiểu Mỹ gửi thông tin học phí khóa Model Kids hôm trước không biết Mẹ đã xem qua chưa ạ? Nếu Mẹ còn phân vân về thời gian học hay đưa đón bé, em luôn sẵn sàng hỗ trợ sắp xếp lịch thuận tiện nhất cho Mẹ nha!",
     isActive: true,
     totalExecutedCount: 86,
     lastExecutedTime: "Hôm nay 14:00",
@@ -47,7 +47,7 @@ let mockTasks: AiTaskItem[] = [
     channel: "Zalo OA",
     frequency: "Kích hoạt tức thì ngay khi chốt đơn",
     templateMessage:
-      "Chúc mừng Chị và bé đã chính thức trở thành học viên của T.A Academy! Em An An gửi Chị Cẩm nang hướng dẫn chuẩn bị trang phục và lộ trình buổi học đầu tiên tại đây nhé ạ...",
+      "Chúc mừng Chị và bé đã chính thức trở thành học viên của T.A Academy! Em Tiểu Mỹ gửi Chị Cẩm nang hướng dẫn chuẩn bị trang phục và lộ trình buổi học đầu tiên tại đây nhé ạ...",
     isActive: true,
     totalExecutedCount: 215,
     lastExecutedTime: "Hôm qua 18:30",

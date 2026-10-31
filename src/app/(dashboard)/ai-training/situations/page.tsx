@@ -2,17 +2,32 @@
 
 import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import { Layers, Plus, CheckCircle2, AlertTriangle, BookCheck, X, Check } from "lucide-react";
+import {
+  Layers,
+  Plus,
+  CheckCircle2,
+  AlertTriangle,
+  BookCheck,
+  X,
+  Check,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { SituationRule } from "@/lib/services/aiTrainingService";
 
 export default function AiSituationsPage() {
   const [situations, setSituations] = useState<SituationRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState<SituationRule["category"]>("Tâm lý học viên");
-  const [newIdeal, setNewIdeal] = useState("");
-  const [newMistake, setNewMistake] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingSituation, setEditingSituation] = useState<SituationRule | null>(null);
+
+  // Form states
+  const [formTitle, setFormTitle] = useState("");
+  const [formCategory, setFormCategory] = useState<SituationRule["category"]>("Tâm lý học viên");
+  const [formIdeal, setFormIdeal] = useState("");
+  const [formMistake, setFormMistake] = useState("");
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -39,19 +54,36 @@ export default function AiSituationsPage() {
     fetchSituations();
   }, []);
 
+  const handleOpenAdd = () => {
+    setFormTitle("");
+    setFormCategory("Tâm lý học viên");
+    setFormIdeal("");
+    setFormMistake("");
+    setIsAddModalOpen(true);
+  };
+
+  const handleOpenEdit = (sit: SituationRule) => {
+    setEditingSituation(sit);
+    setFormTitle(sit.title);
+    setFormCategory(sit.category);
+    setFormIdeal(sit.idealResponse);
+    setFormMistake(sit.mistakeAvoid);
+    setIsEditModalOpen(true);
+  };
+
   const handleAddSituation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim() || !newIdeal.trim()) return;
+    if (!formTitle.trim() || !formIdeal.trim()) return;
 
     try {
       const res = await fetch("/api/ai/situations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: newTitle.trim(),
-          category: newCategory,
-          idealResponse: newIdeal.trim(),
-          mistakeAvoid: newMistake.trim() || "Không tranh cãi, không tự ý báo giá sai lệch.",
+          title: formTitle.trim(),
+          category: formCategory,
+          idealResponse: formIdeal.trim(),
+          mistakeAvoid: formMistake.trim() || "Không tranh cãi, không tự ý báo giá sai lệch.",
         }),
       });
 
@@ -59,13 +91,62 @@ export default function AiSituationsPage() {
       if (res.ok && json.success) {
         setSituations([...situations, json.data]);
         setIsAddModalOpen(false);
-        setNewTitle("");
-        setNewIdeal("");
-        setNewMistake("");
         showToast("Đã thêm tình huống thực tế và câu trả lời mẫu thành công!");
       }
     } catch (err) {
       alert("Lỗi thêm tình huống");
+    }
+  };
+
+  const handleUpdateSituation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSituation || !formTitle.trim() || !formIdeal.trim()) return;
+
+    try {
+      const res = await fetch("/api/ai/situations", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingSituation.id,
+          title: formTitle.trim(),
+          category: formCategory,
+          idealResponse: formIdeal.trim(),
+          mistakeAvoid: formMistake.trim(),
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setSituations(
+          situations.map((s) => (s.id === editingSituation.id ? json.data : s))
+        );
+        setIsEditModalOpen(false);
+        setEditingSituation(null);
+        showToast("Đã cập nhật tình huống thành công!");
+      } else {
+        alert(json.message || "Lỗi cập nhật");
+      }
+    } catch (err) {
+      alert("Lỗi kết nối khi cập nhật");
+    }
+  };
+
+  const handleDeleteSituation = async (id: string, title: string) => {
+    if (!confirm(`Bạn có chắc chắn muốn xóa tình huống "${title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/ai/situations?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setSituations(situations.filter((s) => s.id !== id));
+        showToast(`Đã xóa tình huống thành công!`);
+      } else {
+        alert(json.message || "Lỗi khi xóa");
+      }
+    } catch (err) {
+      alert("Lỗi kết nối khi xóa");
     }
   };
 
@@ -98,7 +179,7 @@ export default function AiSituationsPage() {
 
         <button
           type="button"
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={handleOpenAdd}
           className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-all active:scale-95"
         >
           <Plus className="w-4 h-4" />
@@ -116,9 +197,29 @@ export default function AiSituationsPage() {
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
                 {sit.category}
               </span>
-              <span className="text-emerald-700 font-bold text-[11px] flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Đã duyệt vào quy tắc AI
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-emerald-700 font-bold text-[11px] flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Đã duyệt vào quy tắc AI
+                </span>
+                <div className="flex items-center gap-1 border-l border-slate-200 pl-3">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(sit)}
+                    className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Chỉnh sửa tình huống"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSituation(sit.id, sit.title)}
+                    className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Xóa tình huống"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
@@ -170,12 +271,14 @@ export default function AiSituationsPage() {
 
             <form onSubmit={handleAddSituation} className="p-6 space-y-4 text-xs">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Tình huống / Câu hỏi phụ huynh đặt ra <span className="text-red-500">*</span></label>
+                <label className="font-bold text-slate-700">
+                  Tình huống / Câu hỏi phụ huynh đặt ra <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
                   placeholder="Ví dụ: Phụ huynh thắc mắc: 'Bé 5 tuổi chưa biết nghe lời có học được không?'"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"
                 />
@@ -184,8 +287,8 @@ export default function AiSituationsPage() {
               <div className="space-y-1">
                 <label className="font-bold text-slate-700">Nhóm phân loại</label>
                 <select
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value as any)}
+                  value={formCategory}
+                  onChange={(e) => setFormCategory(e.target.value as any)}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
                 >
                   <option value="Tâm lý học viên">Tâm lý học viên</option>
@@ -196,41 +299,134 @@ export default function AiSituationsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Câu trả lời mẫu mực của AI (Ideal Response) <span className="text-red-500">*</span></label>
+                <label className="font-bold text-slate-700">
+                  Câu trả lời mẫu mực của AI (Ideal Response) <span className="text-red-500">*</span>
+                </label>
                 <textarea
-                  rows={4}
                   required
-                  value={newIdeal}
-                  onChange={(e) => setNewIdeal(e.target.value)}
-                  placeholder="Dạ Mẹ yên tâm nhé ạ! Ở độ tuổi này các cô giáo tại T.A Academy có phương pháp dỗ dành và lồng ghép trò chơi vận động giúp con thích thú..."
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed"
+                  rows={4}
+                  value={formIdeal}
+                  onChange={(e) => setFormIdeal(e.target.value)}
+                  placeholder="Nhập câu trả lời mẫu chuẩn mực, tinh tế và chuyên nghiệp..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Lỗi tối kỵ AI cần tránh</label>
+                <label className="font-bold text-slate-700">Lỗi tối kỵ cần tránh</label>
                 <input
                   type="text"
-                  value={newMistake}
-                  onChange={(e) => setNewMistake(e.target.value)}
-                  placeholder="Ví dụ: Không được nói 'bé quậy quá khó dạy'..."
+                  value={formMistake}
+                  onChange={(e) => setFormMistake(e.target.value)}
+                  placeholder="Ví dụ: Không chê bai đối thủ, không tự ý báo giảm giá..."
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="pt-2 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
+                  className="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold"
                 >
-                  Hủy
+                  Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-md"
+                  className="px-5 py-2 text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl font-bold shadow-md"
                 >
-                  Duyệt Đưa Vào Quy Tắc AI
+                  Thêm Tình Huống
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Edit Situation */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 bg-[#DC2626] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Pencil className="w-5 h-5 text-white" />
+                <h3 className="font-bold text-sm tracking-tight">
+                  Chỉnh Sửa Tình Huống Thực Tế
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-white/20 text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateSituation} className="p-6 space-y-4 text-xs">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">
+                  Tình huống / Câu hỏi phụ huynh đặt ra <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Nhóm phân loại</label>
+                <select
+                  value={formCategory}
+                  onChange={(e) => setFormCategory(e.target.value as any)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
+                >
+                  <option value="Tâm lý học viên">Tâm lý học viên</option>
+                  <option value="Xử lý học phí">Xử lý học phí</option>
+                  <option value="Khai thác thông tin">Khai thác thông tin</option>
+                  <option value="Lịch học & Đưa đón">Lịch học &amp; Đưa đón</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">
+                  Câu trả lời mẫu mực của AI (Ideal Response) <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={formIdeal}
+                  onChange={(e) => setFormIdeal(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Lỗi tối kỵ cần tránh</label>
+                <input
+                  type="text"
+                  value={formMistake}
+                  onChange={(e) => setFormMistake(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl font-bold shadow-md"
+                >
+                  Lưu Thay Đổi
                 </button>
               </div>
             </form>

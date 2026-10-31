@@ -26,179 +26,9 @@ export interface ConversationItem {
   elearningStatus: "synced" | "not_enrolled";
 }
 
-let mockConversations: ConversationItem[] = [
-  {
-    id: "conv-1",
-    name: "Phạm Thu Hương",
-    avatar: "H",
-    channel: "facebook",
-    lastMessage: "Bé nhà em 7 tuổi hơi nhút nhát, lưng đi hơi gù, số em là 0988123456 bên mình có lớp học thử không ạ?",
-    time: "14:32",
-    unread: 1,
-    aiMode: "ai_auto",
-    phone: "0988123456",
-    phoneAutoExtracted: true,
-    course: "Model Kids (Mẫu Nhí Tài Năng)",
-    courseCategory: "model_kids",
-    status: "uncalled",
-    aiExtractedNeed: "Bé 7 tuổi nhút nhát, lưng đi gù, muốn rèn sự tự tin và dáng đi chuẩn mẫu nhí",
-    elearningStatus: "not_enrolled",
-  },
-  {
-    id: "conv-2",
-    name: "Nguyễn Hoàng Nam",
-    avatar: "N",
-    channel: "zalo",
-    lastMessage: "Em gửi giúp anh học phí chi tiết khóa Phong thái Doanh nhân nhé.",
-    time: "13:15",
-    unread: 0,
-    aiMode: "human_takeover",
-    agentName: "Lê Minh Trang",
-    phone: "0912345888",
-    phoneAutoExtracted: true,
-    course: "Phong Thái Doanh Nhân",
-    courseCategory: "phong_thai",
-    status: "called",
-    aiExtractedNeed: "Doanh nhân muốn học nâng tầm phong thái giao tiếp, thần thái đàm phán kinh doanh",
-    elearningStatus: "not_enrolled",
-  },
-  {
-    id: "conv-3",
-    name: "Hoàng Kiều Trinh",
-    avatar: "T",
-    channel: "facebook",
-    lastMessage: "Dạ em đã nhận được lịch học thử sáng thứ 7 rồi, cảm ơn học viện ạ!",
-    time: "10:40",
-    unread: 0,
-    aiMode: "ai_auto",
-    phone: "0909555666",
-    phoneAutoExtracted: false,
-    course: "Catwalk Chuyên Nghiệp",
-    courseCategory: "catwalk",
-    status: "trial_scheduled",
-    aiExtractedNeed: "Đam mê thời trang, muốn rèn giải phóng hình thể sân khấu và casting show lớn",
-    elearningStatus: "not_enrolled",
-  },
-  {
-    id: "conv-4",
-    name: "Vũ Mai Phương",
-    avatar: "P",
-    channel: "facebook",
-    lastMessage: "Chị đã chuyển khoản học phí rồi em nhé, kiểm tra giúp chị.",
-    time: "Hôm qua",
-    unread: 0,
-    aiMode: "human_takeover",
-    agentName: "Trần Văn Bình",
-    phone: "0934888999",
-    phoneAutoExtracted: true,
-    course: "Phong Thái Quý Cô",
-    courseCategory: "phong_thai",
-    status: "registered",
-    aiExtractedNeed: "Chỉnh dáng đứng, ngồi quý cô thanh lịch và tự tin thuyết trình truyền cảm hứng",
-    elearningStatus: "synced",
-  },
-];
-
-let mockMessagesDb: Record<string, Message[]> = {
-  "conv-1": [
-    {
-      id: "m-1-1",
-      conversation_id: "conv-1",
-      sender_type: "customer",
-      content: "Chào học viện T.A Academy, em muốn tìm hiểu khóa học cho con gái em ạ.",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "14:28",
-    },
-    {
-      id: "m-1-2",
-      conversation_id: "conv-1",
-      sender_type: "ai",
-      sender_name: "Tiểu Mỹ (T.A Academy)",
-      content:
-        "Dạ em Tiểu Mỹ xin chào Chị Hương ạ! Rất vui được đồng hành cùng Chị và con. Chị cho em hỏi bé nhà mình năm nay được mấy tuổi rồi ạ? Mong muốn lớn nhất của Chị khi cho con tham gia lớp học là gì ha Chị? 😊",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "14:29",
-    },
-    {
-      id: "m-1-3",
-      conversation_id: "conv-1",
-      sender_type: "customer",
-      content:
-        "Bé nhà em 7 tuổi hơi nhút nhát, lưng đi hơi gù, số em là 0988123456 bên mình có lớp học thử không ạ?",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "14:32",
-    },
-  ],
-  "conv-2": [
-    {
-      id: "m-2-1",
-      conversation_id: "conv-2",
-      sender_type: "customer",
-      content: "Em gửi giúp anh học phí chi tiết khóa Phong thái Doanh nhân nhé.",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "13:10",
-    },
-    {
-      id: "m-2-2",
-      conversation_id: "conv-2",
-      sender_type: "human_agent",
-      sender_name: "Lê Minh Trang",
-      content:
-        "Dạ em Trang - Chuyên viên tư vấn phong thái T.A Academy xin chào Anh Nam ạ. Khóa Phong Thái Doanh Nhân thiết kế riêng 12 buổi chuyên sâu giúp định hình phong thái đàm phán và thần thái lãnh đạo. Em gửi Anh lộ trình chi tiết qua Zalo này nhé ạ!",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "13:15",
-    },
-  ],
-  "conv-3": [
-    {
-      id: "m-3-1",
-      conversation_id: "conv-3",
-      sender_type: "customer",
-      content: "Dạ em đã nhận được lịch học thử sáng thứ 7 rồi, cảm ơn học viện ạ!",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "10:40",
-    },
-    {
-      id: "m-3-2",
-      conversation_id: "conv-3",
-      sender_type: "ai",
-      sender_name: "AI An An (T.A Academy)",
-      content:
-        "Dạ tuyệt vời quá Trinh ơi! Em nhớ chuẩn bị trang phục ôm sát nhẹ nhàng và giày cao gót thoải mái để buổi học thử đạt hiệu quả tốt nhất nha. Học viện T.A Academy hẹn gặp em vào 09:00 sáng Thứ 7 này nhé!",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "10:41",
-    },
-  ],
-  "conv-4": [
-    {
-      id: "m-4-1",
-      conversation_id: "conv-4",
-      sender_type: "customer",
-      content: "Chị đã chuyển khoản học phí rồi em nhé, kiểm tra giúp chị.",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "Hôm qua 16:40",
-    },
-    {
-      id: "m-4-2",
-      conversation_id: "conv-4",
-      sender_type: "human_agent",
-      sender_name: "Trần Văn Bình",
-      content:
-        "Dạ em Bình đã nhận đủ học phí khóa Phong Thái Quý Cô của Chị Phương rồi ạ! Em đã hoàn tất xếp lớp K26 trên hệ thống E-learning cho Chị. Chúc Chị sẽ có những trải nghiệm thăng hạng phong thái tuyệt vời cùng T.A Academy!",
-      is_internal_note: false,
-      status: "delivered",
-      created_at: "Hôm qua 16:45",
-    },
-  ],
-};
+// DỮ LIỆU HỘI THOẠI & TIN NHẮN THỰC TẾ (KHÔNG DÙNG DỮ LIỆU GIẢ - CHỈ LƯU DỮ LIỆU THẬT)
+let mockConversations: ConversationItem[] = [];
+let mockMessagesDb: Record<string, Message[]> = {};
 
 // Helper format thời gian
 function formatFbTime(isoString: string) {
@@ -216,6 +46,147 @@ function formatFbTime(isoString: string) {
   }
 }
 
+// BỘ TRÍCH XUẤT THÔNG TIN THÔNG MINH TỪ TIN NHẮN KHÁCH HÀNG (SĐT, ĐỘ TUỔI, NHU CẦU THỰC TẾ)
+export function extractCustomerInsights(
+  messagesData: Array<{ message?: string; from?: any }> = [],
+  snippet: string = "",
+  customerName: string = ""
+) {
+  const customerMsgs: string[] = [];
+  for (const m of messagesData) {
+    const isBot =
+      m.from?.id === "212422015280468" ||
+      m.from?.name?.toLowerCase().includes("t. a") ||
+      m.from?.name?.toLowerCase().includes("studio");
+    if (!isBot && m.message) {
+      customerMsgs.push(m.message);
+    }
+  }
+
+  const fullText = customerMsgs.join(" ") + " " + snippet;
+
+  // 1. Số điện thoại (Phone)
+  let extractedPhone: string | undefined = undefined;
+  const phoneMatch =
+    fullText.match(/(?:0|\+84)(?:3|5|7|8|9)\d{8}/) || fullText.match(/\b(0\d{9,10})\b/);
+  if (phoneMatch) {
+    extractedPhone = phoneMatch[0];
+  }
+
+  // 2. Độ tuổi (Age) - Nhận diện chính xác từ tin nhắn khách hàng (vd: "Con tôi 7 tuổi tư vấn" -> 7 tuổi)
+  let extractedAge: number | undefined = undefined;
+  for (const msg of customerMsgs) {
+    const ageMatch =
+      msg.match(/(?:con|bé|cháu)?\s*(?:tôi|mình|em|chị|nhà em)?\s*(?:được|nay)?\s*(\d{1,2})\s*(?:tuổi|t\b|tháng)/i) ||
+      msg.match(/\b(\d{1,2})\s*(?:tuổi|tháng)\b/i);
+    if (ageMatch && ageMatch[1]) {
+      const num = parseInt(ageMatch[1], 10);
+      if (num >= 2 && num <= 70) {
+        extractedAge = num;
+        break;
+      }
+    }
+  }
+  if (!extractedAge) {
+    const ageMatch =
+      fullText.match(/(?:con|bé|cháu)?\s*(?:tôi|mình|em|chị|nhà em)?\s*(?:được|nay)?\s*(\d{1,2})\s*(?:tuổi|tháng)/i) ||
+      fullText.match(/\b(\d{1,2})\s*(?:tuổi|tháng)\b/i);
+    if (ageMatch && ageMatch[1]) {
+      const num = parseInt(ageMatch[1], 10);
+      if (num >= 2 && num <= 70) extractedAge = num;
+    }
+  }
+
+  // 3. Khóa học quan tâm
+  let course = "Model Kids (Mẫu Nhí Tài Năng)";
+  let courseCategory: ConversationItem["courseCategory"] = "model_kids";
+  const lowerAll = fullText.toLowerCase();
+  if (
+    lowerAll.includes("phong thái") ||
+    lowerAll.includes("doanh nhân") ||
+    lowerAll.includes("quý cô")
+  ) {
+    course = "Phong Thái Quý Cô & Doanh Nhân";
+    courseCategory = "phong_thai";
+  } else if (
+    lowerAll.includes("catwalk") ||
+    lowerAll.includes("sân khấu") ||
+    lowerAll.includes("hoa hậu")
+  ) {
+    course = "Catwalk Chuyên Nghiệp";
+    courseCategory = "catwalk";
+  } else if (
+    lowerAll.includes("giao tiếp") ||
+    lowerAll.includes("thuyết trình") ||
+    lowerAll.includes("mc")
+  ) {
+    course = "Nghệ Thuật Giao Tiếp & Thuyết Trình";
+    courseCategory = "giao_tiep";
+  }
+
+  // 4. Phân tích nhu cầu thực tế
+  const specificNeeds: string[] = [];
+  if (
+    lowerAll.includes("dáng đi") ||
+    lowerAll.includes("cải thiện dáng") ||
+    lowerAll.includes("chỉnh dáng")
+  ) {
+    specificNeeds.push("cải thiện dáng đi");
+  }
+  if (lowerAll.includes("gù") || lowerAll.includes("lưng")) {
+    specificNeeds.push("chỉnh tật gù lưng");
+  }
+  if (lowerAll.includes("nhút nhát") || lowerAll.includes("tự tin") || lowerAll.includes("rụt rè")) {
+    specificNeeds.push("rèn luyện sự tự tin");
+  }
+  if (lowerAll.includes("học thử") || lowerAll.includes("trải nghiệm")) {
+    specificNeeds.push("đăng ký học thử");
+  }
+  if (
+    lowerAll.includes("học phí") ||
+    lowerAll.includes("chi phí") ||
+    lowerAll.includes("bao nhiêu tiền")
+  ) {
+    specificNeeds.push("hỏi học phí");
+  }
+  if (
+    lowerAll.includes("casting") ||
+    lowerAll.includes("người mẫu") ||
+    lowerAll.includes("mẫu nhí")
+  ) {
+    specificNeeds.push("định hướng mẫu nhí & sân khấu");
+  }
+
+  let aiExtractedNeed = "";
+  if (extractedAge && specificNeeds.length > 0) {
+    aiExtractedNeed = `Bé ${extractedAge} tuổi, phụ huynh muốn ${specificNeeds.join(", ")}`;
+  } else if (extractedAge) {
+    aiExtractedNeed = `Bé ${extractedAge} tuổi, phụ huynh muốn tư vấn khóa học phù hợp lứa tuổi`;
+  } else if (specificNeeds.length > 0) {
+    aiExtractedNeed = `Phụ huynh quan tâm: ${specificNeeds.join(", ")}`;
+  } else if (customerMsgs.length > 0) {
+    const lastCustomerMsg =
+      customerMsgs[0].length > 60 ? customerMsgs[0].slice(0, 60) + "..." : customerMsgs[0];
+    aiExtractedNeed = `Khách hàng nhắn: "${lastCustomerMsg}"`;
+  } else {
+    aiExtractedNeed = "Khách hàng nhắn tin quan tâm khóa học qua Fanpage Facebook";
+  }
+
+  const currentYear = new Date().getFullYear();
+  const dob = extractedAge
+    ? `Năm ${currentYear - extractedAge} (${extractedAge} tuổi)`
+    : "Chưa cập nhật";
+
+  return {
+    phone: extractedPhone,
+    age: extractedAge,
+    dob,
+    course,
+    courseCategory,
+    aiExtractedNeed,
+  };
+}
+
 // 1. LẤY DANH SÁCH HỘI THOẠI (KẾT HỢP DỮ LIỆU THỰC TỪ FACEBOOK GRAPH API)
 export async function getInboxConversations(params?: {
   channel?: string;
@@ -229,7 +200,7 @@ export async function getInboxConversations(params?: {
   if (fbToken && fbToken.startsWith("EA")) {
     try {
       const fbRes = await fetch(
-        `https://graph.facebook.com/v19.0/me/conversations?fields=id,snippet,updated_time,participants,unread_count&limit=15&access_token=${fbToken}`,
+        `https://graph.facebook.com/v19.0/me/conversations?fields=id,snippet,updated_time,participants,unread_count,messages.limit(50){id,message,from,created_time}&limit=25&access_token=${fbToken}`,
         { cache: "no-store" }
       );
       if (fbRes.ok) {
@@ -247,23 +218,32 @@ export async function getInboxConversations(params?: {
 
             const customerName = customer?.name || "Khách Facebook";
             const snippet = item.snippet || "";
-            const phoneMatch = snippet.match(/(?:0|\+84)(?:3|5|7|8|9)\d{8}/);
-            const extractedPhone = phoneMatch
-              ? phoneMatch[0]
-              : item.id === "t_2316278525803422"
-              ? "0945678240"
-              : undefined;
+            const messagesData = item.messages?.data || [];
 
-            // Xác định khóa học quan tâm
-            let course = "Model Kids (Mẫu Nhí Tài Năng)";
-            let courseCategory: ConversationItem["courseCategory"] = "model_kids";
-            const lowerSnippet = snippet.toLowerCase();
-            if (lowerSnippet.includes("phong thái") || lowerSnippet.includes("doanh nhân")) {
-              course = "Phong Thái Quý Cô & Doanh Nhân";
-              courseCategory = "phong_thai";
-            } else if (lowerSnippet.includes("catwalk") || lowerSnippet.includes("sân khấu")) {
-              course = "Catwalk Chuyên Nghiệp";
-              courseCategory = "catwalk";
+            // AI Bóc tách dữ liệu chính xác (SĐT, Tuổi, Nhu cầu)
+            const insights = extractCustomerInsights(messagesData, snippet, customerName);
+
+            // Lưu cache các tin nhắn để hiển thị ngay trong cửa sổ chat
+            if (messagesData.length > 0) {
+              const sorted = [...messagesData].reverse();
+              mockMessagesDb[item.id] = sorted
+                .filter((m: any) => m.message)
+                .map((m: any) => {
+                  const isPage =
+                    m.from?.id === "212422015280468" ||
+                    m.from?.name?.toLowerCase().includes("t. a") ||
+                    m.from?.name?.toLowerCase().includes("studio");
+                  return {
+                    id: m.id || `fb-msg-${Date.now()}-${Math.random()}`,
+                    conversation_id: item.id,
+                    sender_type: isPage ? "ai" : "customer",
+                    sender_name: isPage ? "Tiểu Mỹ (T.A Academy)" : m.from?.name || "Khách hàng",
+                    content: m.message,
+                    is_internal_note: false,
+                    status: "delivered",
+                    created_at: formatFbTime(m.created_time),
+                  };
+                });
             }
 
             const existingIndex = mockConversations.findIndex(
@@ -279,15 +259,12 @@ export async function getInboxConversations(params?: {
               time: formatFbTime(item.updated_time),
               unread: item.unread_count || 0,
               aiMode: "ai_auto",
-              phone: extractedPhone,
-              phoneAutoExtracted: Boolean(extractedPhone),
-              course,
-              courseCategory,
-              status: extractedPhone ? "uncalled" : "consulting",
-              aiExtractedNeed:
-                item.id === "t_2316278525803422"
-                  ? "Bé 4 tuổi, phụ huynh muốn cải thiện dáng đi và sự tự tin"
-                  : "Khách hàng nhắn tin quan tâm khóa học qua Fanpage Facebook",
+              phone: insights.phone,
+              phoneAutoExtracted: Boolean(insights.phone),
+              course: insights.course,
+              courseCategory: insights.courseCategory,
+              status: insights.phone ? "uncalled" : "consulting",
+              aiExtractedNeed: insights.aiExtractedNeed,
               elearningStatus: "not_enrolled",
             };
 
@@ -300,17 +277,18 @@ export async function getInboxConversations(params?: {
               mockConversations.unshift(convData);
             }
 
-            // Đồng bộ sang danh sách khách hàng tư vấn nếu có khách thực tế
+            // Tự động đồng bộ sang danh sách khách hàng tư vấn với thông tin chính xác
             try {
               addConsultation({
                 customerName,
-                phone: extractedPhone || null,
-                courseRef: courseCategory,
-                aiExtractedNeed: convData.aiExtractedNeed,
+                phone: insights.phone || null,
+                courseRef: insights.courseCategory,
+                aiExtractedNeed: insights.aiExtractedNeed,
                 source: "facebook",
+                dob: insights.dob,
               });
             } catch (syncErr) {
-              // Bỏ qua nếu đã tồn tại
+              // Bỏ qua nếu đã đồng bộ
             }
           }
         }
@@ -359,14 +337,14 @@ export async function getConversationMessages(conversationId: string): Promise<M
       if (res.ok) {
         const json = await res.json();
         if (json.data && Array.isArray(json.data)) {
-          // Tin nhắn từ Facebook trả về từ mới nhất đến cũ nhất -> đảo ngược để chat hiển thị từ trên xuống
           const sorted = [...json.data].reverse();
           const mappedMessages: Message[] = sorted
             .filter((m: any) => m.message)
             .map((m: any) => {
               const isPage =
                 m.from?.id === "212422015280468" ||
-                m.from?.name?.includes("T. A");
+                m.from?.name?.toLowerCase().includes("t. a") ||
+                m.from?.name?.toLowerCase().includes("studio");
               return {
                 id: m.id,
                 conversation_id: conversationId,
@@ -378,6 +356,7 @@ export async function getConversationMessages(conversationId: string): Promise<M
                 created_at: formatFbTime(m.created_time),
               };
             });
+          mockMessagesDb[conversationId] = mappedMessages;
           return mappedMessages;
         }
       }
@@ -411,7 +390,7 @@ export function sendInboxMessage(data: {
     id: `m-${Date.now()}`,
     conversation_id: data.conversationId,
     sender_type: data.senderType,
-    sender_name: data.senderName || (data.senderType === "ai" ? "AI An An" : "Tư vấn viên"),
+    sender_name: data.senderName || (data.senderType === "ai" ? "Tiểu Mỹ (T.A Academy)" : "Tư vấn viên"),
     content: data.content,
     is_internal_note: false,
     status: "delivered",
@@ -427,7 +406,6 @@ export function sendInboxMessage(data: {
   conversation.lastMessage = data.content;
   conversation.time = timeString;
 
-  // QUY TẮC CỐT LÕI:
   // Nếu nhân viên gửi tin -> Tự động chuyển chế độ sang "human_takeover" (Khóa AI can thiệp)
   if (data.senderType === "human_agent") {
     conversation.aiMode = "human_takeover";
@@ -435,7 +413,7 @@ export function sendInboxMessage(data: {
     conversation.unread = 0;
   }
 
-  // Nếu khách gửi tin -> Tự động trích xuất SĐT nếu có
+  // Nếu khách gửi tin -> Tự động trích xuất SĐT và nhu cầu nếu có
   if (data.senderType === "customer") {
     extractPhoneAndNeeds(conversation, data.content);
   }
@@ -472,29 +450,26 @@ export function generateAiResponse(conversationId: string, isCopilot = false) {
       ?.filter((m) => m.sender_type === "customer")
       .slice(-1)[0]?.content || "";
 
-  // Tạo phản hồi ngữ cảnh thông minh chuẩn T.A Academy
   let replyText = "";
   const lowerMsg = lastCustomerMessage.toLowerCase();
 
   if (lowerMsg.includes("học thử") || lowerMsg.includes("lịch học")) {
     replyText = `Dạ em Tiểu Mỹ xin gửi Mẹ lịch học thử trải nghiệm miễn phí khóa ${conversation.course} vào Thứ 7 (09:00 - 10:30) hoặc Chủ Nhật (15:00 - 16:30) tuần này ạ. Mẹ đăng ký ca nào để em giữ chỗ và chuẩn bị giáo cụ tốt nhất cho con nhé? ✨`;
-  } else if (lowerMsg.includes("học phí") || lowerMsg.includes("giá")) {
-    replyText = `Dạ khóa ${conversation.course} tại T.A Academy có lộ trình chuẩn 12 buổi học trực tiếp cùng chuyên gia phong thái, học phí niêm yết là 6.500.000đ. Đang có ưu đãi đặc quyền tặng 1 buổi định hình dáng đi cá nhân nếu Mẹ đăng ký trong tuần này ạ!`;
-  } else if (lowerMsg.includes("địa chỉ") || lowerMsg.includes("ở đâu")) {
-    replyText = `Dạ trụ sở chính Học viện T.A Academy tại Toà nhà Landmark, Quận 1, TP.HCM ạ. Học viện có bãi đỗ xe ô tô và sảnh đón phụ huynh rất tiện lợi. Em xin phép đón Mẹ và bé đến tham quan lớp học vào ngày gần nhất nha Mẹ! 🌸`;
+  } else if (lowerMsg.includes("học phí") || lowerMsg.includes("bao nhiêu")) {
+    replyText = `Dạ khóa ${conversation.course} tại T.A Academy có học phí niêm yết là 6.800.000 VNĐ cho lộ trình 12 buổi kèm cặp chuyên sâu cùng các chuyên gia hàng đầu. Đặc biệt trong tuần này học viện có ưu đãi đặc quyền tặng kèm 1 buổi chụp hình profile chuyên nghiệp cho bé. Mẹ cho em xin số điện thoại để em gửi ưu đãi cho con nha Mẹ! 🌸`;
+  } else if (lowerMsg.includes("gù") || lowerMsg.includes("nhút nhát")) {
+    replyText = `Dạ Mẹ hoàn toàn yên tâm nha! Đây là trăn trở của rất nhiều phụ huynh khi mới đưa con đến T.A Academy. Giáo trình khóa ${conversation.course} được thiết kế với các bài tập chỉnh dáng đi, giải phóng hình thể nhẹ nhàng để con tự tin mở lòng hơn qua từng buổi học mà không có bất kỳ áp lực nào ạ. Em mời Mẹ cho bé ghé học thử một buổi nhé ạ!`;
   } else {
-    replyText = `Dạ em Tiểu Mỹ đã ghi nhận mong muốn của Chị về khóa ${conversation.course} cho bé. Để tư vấn lộ trình phù hợp nhất với thể trạng và tính cách của con, Chị cho em xin số điện thoại để chuyên viên tư vấn gọi điện gửi ảnh lớp học trực quan cho Chị nha! 😊`;
+    replyText = `Dạ em Tiểu Mỹ xin chào Chị ạ! Rất vui được đồng hành cùng Chị. Với khóa ${conversation.course}, giảng viên tại T.A Academy sẽ kèm cặp sát sao để con rèn luyện phong thái và dáng đi chuẩn nhất. Chị cho em xin thêm thông tin về độ tuổi của bé hoặc số điện thoại để em hỗ trợ tư vấn chi tiết cho mình nha! ✨`;
   }
 
   if (isCopilot) {
-    // Chỉ trả về gợi ý cho nhân viên duyệt
     return {
       suggestedReply: replyText,
       intentDetected: "consultation_inquiry",
     };
   }
 
-  // Nếu là AI Auto -> Gửi tin nhắn trực tiếp
   return sendInboxMessage({
     conversationId,
     content: replyText,
@@ -505,20 +480,66 @@ export function generateAiResponse(conversationId: string, isCopilot = false) {
 
 // 6. TỰ ĐỘNG TRÍCH XUẤT SĐT VÀ NHU CẦU TỪ TIN NHẮN KHÁCH HÀNG
 function extractPhoneAndNeeds(conversation: ConversationItem, content: string) {
-  // Regex tìm kiếm số điện thoại Việt Nam (10 chữ số bắt đầu bằng 03, 05, 07, 08, 09)
-  const phoneMatch = content.match(/(?:0|\+84)(?:3|5|7|8|9)\d{8}/);
+  const phoneMatch =
+    content.match(/(?:0|\+84)(?:3|5|7|8|9)\d{8}/) || content.match(/\b(0\d{9,10})\b/);
   if (phoneMatch) {
-    const extractedPhone = phoneMatch[0];
-    conversation.phone = extractedPhone;
+    conversation.phone = phoneMatch[0];
     conversation.phoneAutoExtracted = true;
-    conversation.status = "uncalled"; // Kích hoạt đưa vào danh sách Khách chưa gọi (SLA)
+    conversation.status = "uncalled";
   }
 
-  // Tự động phân tích nhu cầu
-  if (content.toLowerCase().includes("nhút nhát") || content.toLowerCase().includes("gù")) {
-    conversation.aiExtractedNeed = "Bé nhút nhát, lưng đi hơi gù, muốn rèn dáng đi tự tin trước đám đông";
-  } else if (content.toLowerCase().includes("thời trang") || content.toLowerCase().includes("show")) {
-    conversation.aiExtractedNeed = "Quan tâm cơ hội diễn show và giải phóng hình thể sân khấu";
+  let age: number | undefined = undefined;
+  const ageMatch =
+    content.match(/(?:con|bé|cháu)?\s*(?:tôi|mình|em|chị|nhà em)?\s*(?:được|nay)?\s*(\d{1,2})\s*(?:tuổi|t\b|tháng)/i) ||
+    content.match(/\b(\d{1,2})\s*(?:tuổi|tháng)\b/i);
+  if (ageMatch && ageMatch[1]) {
+    const num = parseInt(ageMatch[1], 10);
+    if (num >= 2 && num <= 70) age = num;
+  }
+
+  const lower = content.toLowerCase();
+  const specificNeeds: string[] = [];
+  if (
+    lower.includes("dáng đi") ||
+    lower.includes("cải thiện dáng") ||
+    lower.includes("chỉnh dáng")
+  ) {
+    specificNeeds.push("cải thiện dáng đi");
+  }
+  if (lower.includes("gù") || lower.includes("lưng")) {
+    specificNeeds.push("chỉnh tật gù lưng");
+  }
+  if (lower.includes("nhút nhát") || lower.includes("tự tin") || lower.includes("rụt rè")) {
+    specificNeeds.push("rèn luyện sự tự tin");
+  }
+  if (lower.includes("học thử") || lower.includes("trải nghiệm")) {
+    specificNeeds.push("đăng ký học thử");
+  }
+  if (lower.includes("học phí") || lower.includes("chi phí")) {
+    specificNeeds.push("tư vấn học phí");
+  }
+
+  if (age && specificNeeds.length > 0) {
+    conversation.aiExtractedNeed = `Bé ${age} tuổi, phụ huynh muốn ${specificNeeds.join(", ")}`;
+  } else if (age) {
+    conversation.aiExtractedNeed = `Bé ${age} tuổi, phụ huynh muốn tư vấn khóa học phù hợp`;
+  } else if (specificNeeds.length > 0) {
+    conversation.aiExtractedNeed = `Phụ huynh quan tâm: ${specificNeeds.join(", ")}`;
+  }
+
+  try {
+    const currentYear = new Date().getFullYear();
+    const dob = age ? `Năm ${currentYear - age} (${age} tuổi)` : undefined;
+    addConsultation({
+      customerName: conversation.name,
+      phone: conversation.phone || null,
+      courseRef: conversation.courseCategory,
+      aiExtractedNeed: conversation.aiExtractedNeed,
+      source: conversation.channel,
+      dob,
+    });
+  } catch (err) {
+    // Bỏ qua lỗi đồng bộ
   }
 }
 
@@ -532,23 +553,33 @@ export function handleIncomingFacebookMessage(data: {
   const convId = `fb-${senderId}`;
   const senderName = data.senderName?.trim() || `Khách Facebook #${senderId.slice(-4)}`;
 
-  // 1. Phân loại khóa học quan tâm
   const lowerMsg = data.messageText.toLowerCase();
   let courseCategory: "model_kids" | "phong_thai" | "catwalk" | "giao_tiep" = "model_kids";
   let courseName = "Model Kids (Mẫu Nhí Tài Năng)";
 
-  if (lowerMsg.includes("phong thái") || lowerMsg.includes("quý cô") || lowerMsg.includes("doanh nhân")) {
+  if (
+    lowerMsg.includes("phong thái") ||
+    lowerMsg.includes("quý cô") ||
+    lowerMsg.includes("doanh nhân")
+  ) {
     courseCategory = "phong_thai";
     courseName = "Phong Thái Quý Cô & Doanh Nhân";
-  } else if (lowerMsg.includes("catwalk") || lowerMsg.includes("sân khấu") || lowerMsg.includes("người mẫu")) {
+  } else if (
+    lowerMsg.includes("catwalk") ||
+    lowerMsg.includes("sân khấu") ||
+    lowerMsg.includes("người mẫu")
+  ) {
     courseCategory = "catwalk";
     courseName = "Catwalk Chuyên Nghiệp";
-  } else if (lowerMsg.includes("giao tiếp") || lowerMsg.includes("thuyết trình") || lowerMsg.includes("tự tin")) {
+  } else if (
+    lowerMsg.includes("giao tiếp") ||
+    lowerMsg.includes("thuyết trình") ||
+    lowerMsg.includes("tự tin")
+  ) {
     courseCategory = "giao_tiep";
     courseName = "Nghệ Thuật Giao Tiếp & Thuyết Trình";
   }
 
-  // 2. Tìm hoặc khởi tạo hội thoại trong Hộp thư
   let conversation = mockConversations.find((c) => c.id === convId || c.name === senderName);
   const now = new Date();
   const timeString = `${now.getHours().toString().padStart(2, "0")}:${now
@@ -580,10 +611,8 @@ export function handleIncomingFacebookMessage(data: {
     conversation.unread += 1;
   }
 
-  // 3. Trích xuất SĐT & nhu cầu
   extractPhoneAndNeeds(conversation, data.messageText);
 
-  // 4. Lưu tin nhắn của khách hàng
   const customerMsg: Message = {
     id: `m-cust-${Date.now()}`,
     conversation_id: conversation.id,
@@ -600,54 +629,14 @@ export function handleIncomingFacebookMessage(data: {
   }
   mockMessagesDb[conversation.id].push(customerMsg);
 
-  // 5. Tự động sinh câu trả lời AI nếu đang bật ai_auto
-  let aiReplyText = "";
-  let aiMessage: Message | null = null;
-
+  // Tự động kích hoạt phản hồi của AI Tiểu Mỹ nếu hội thoại ở chế độ AI Auto
+  let aiReply: Message | null = null;
   if (conversation.aiMode === "ai_auto") {
-    if (lowerMsg.includes("học thử") || lowerMsg.includes("trải nghiệm")) {
-      aiReplyText = `Dạ em Tiểu Mỹ xin chào ${senderName}! Em rất vui được hỗ trợ Chị tìm hiểu khóa ${conversation.course}. Cuối tuần này (Thứ 7 lúc 09:00 hoặc Chủ Nhật lúc 15:00) học viện có tổ chức lớp học thử trải nghiệm miễn phí ạ. Chị cho em xin số điện thoại để em giữ chỗ và chuẩn bị trang phục cho con nha! ✨`;
-    } else if (lowerMsg.includes("học phí") || lowerMsg.includes("bao nhiêu tiền") || lowerMsg.includes("giá")) {
-      aiReplyText = `Dạ học phí chính thức khóa ${conversation.course} tại T.A Academy được đào tạo trực tiếp cùng các chuyên gia hàng đầu. Trong tuần này học viện đang có ưu đãi đặc quyền tặng kèm 1 buổi định hình phong thái cá nhân khi đăng ký giữ chỗ sớm ạ! 🌸`;
-    } else {
-      aiReplyText = `Dạ em Tiểu Mỹ (T.A Academy) đã nhận được tin nhắn từ ${senderName} ạ! Với khóa ${conversation.course}, giảng viên sẽ kèm cặp sát sao để đạt kết quả tốt nhất. Chị cho em xin số điện thoại hoặc độ tuổi của bé để em tư vấn giáo trình chi tiết nhất cho mình nha! 😊`;
+    const res = generateAiResponse(conversation.id, false);
+    if ("message" in res) {
+      aiReply = res.message;
     }
-
-    aiMessage = {
-      id: `m-ai-${Date.now()}`,
-      conversation_id: conversation.id,
-      sender_type: "ai",
-      sender_name: "Tiểu Mỹ (T.A Academy)",
-      content: aiReplyText,
-      is_internal_note: false,
-      status: "delivered",
-      created_at: timeString,
-    };
-    mockMessagesDb[conversation.id].push(aiMessage);
-    conversation.lastMessage = aiReplyText;
   }
 
-  // 6. Đồng bộ sang Quản lý khách hàng tư vấn nếu có SĐT hoặc khách hàng mới
-  let syncedLead = null;
-  try {
-    syncedLead = addConsultation({
-      customerName: senderName,
-      phone: conversation.phone || null,
-      courseRef: courseCategory,
-      aiExtractedNeed: conversation.aiExtractedNeed || "Khách nhắn tin qua Fanpage",
-      source: "facebook",
-    });
-  } catch (e) {
-    console.error("Lỗi đồng bộ khách hàng tư vấn:", e);
-  }
-
-  return {
-    conversation,
-    customerMessage: customerMsg,
-    aiMessage,
-    aiReplyText,
-    extractedPhone: conversation.phone || null,
-    extractedNeed: conversation.aiExtractedNeed,
-    syncedLead,
-  };
+  return { conversation, customerMessage: customerMsg, aiReply };
 }

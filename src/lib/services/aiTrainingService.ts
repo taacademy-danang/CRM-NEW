@@ -401,6 +401,27 @@ export function addGuidedScenario(data: Omit<GuidedScenario, "stepsCount">) {
   return newScenario;
 }
 
+export function updateGuidedScenario(code: string, data: Partial<GuidedScenario>) {
+  const scenario = guidedScenariosStore.find((s) => s.code === code);
+  if (!scenario) throw new Error("Không tìm thấy kịch bản tư vấn");
+  if (data.title) scenario.title = data.title.trim();
+  if (data.course) scenario.course = data.course;
+  if (data.goal) scenario.goal = data.goal.trim();
+  if (data.status) scenario.status = data.status;
+  if (data.steps && Array.isArray(data.steps)) {
+    scenario.steps = data.steps;
+    scenario.stepsCount = data.steps.length;
+  }
+  return scenario;
+}
+
+export function deleteGuidedScenario(code: string) {
+  const index = guidedScenariosStore.findIndex((s) => s.code === code);
+  if (index === -1) throw new Error("Không tìm thấy kịch bản để xóa");
+  const deleted = guidedScenariosStore.splice(index, 1)[0];
+  return deleted;
+}
+
 // 5. THƯ VIỆN TÌNH HUỐNG (SITUATIONS)
 export function getSituations() {
   return [...situationsStore];
@@ -413,6 +434,23 @@ export function addSituation(data: Omit<SituationRule, "id">) {
   };
   situationsStore.push(newSit);
   return newSit;
+}
+
+export function updateSituation(id: string, data: Partial<SituationRule>) {
+  const sit = situationsStore.find((s) => s.id === id);
+  if (!sit) throw new Error("Không tìm thấy tình huống");
+  if (data.title) sit.title = data.title.trim();
+  if (data.category) sit.category = data.category;
+  if (data.idealResponse) sit.idealResponse = data.idealResponse.trim();
+  if (data.mistakeAvoid) sit.mistakeAvoid = data.mistakeAvoid.trim();
+  return sit;
+}
+
+export function deleteSituation(id: string) {
+  const index = situationsStore.findIndex((s) => s.id === id);
+  if (index === -1) throw new Error("Không tìm thấy tình huống để xóa");
+  const deleted = situationsStore.splice(index, 1)[0];
+  return deleted;
 }
 
 // 6. PHÒNG THỰC HÀNH AI (PLAYGROUND SIMULATOR)

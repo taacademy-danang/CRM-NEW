@@ -2,17 +2,32 @@
 
 import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import { GitPullRequest, Plus, ArrowRight, CheckCircle2, X, Check, BookOpen } from "lucide-react";
+import {
+  GitPullRequest,
+  Plus,
+  CheckCircle2,
+  X,
+  Check,
+  Pencil,
+  Trash2,
+  AlertCircle,
+} from "lucide-react";
 import { GuidedScenario } from "@/lib/services/aiTrainingService";
 
 export default function AiScenariosPage() {
   const [scenarios, setScenarios] = useState<GuidedScenario[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newCourse, setNewCourse] = useState("Model Kids");
-  const [newGoal, setNewGoal] = useState("");
-  const [newSteps, setNewSteps] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingScenario, setEditingScenario] = useState<GuidedScenario | null>(null);
+
+  // Form states
+  const [formTitle, setFormTitle] = useState("");
+  const [formCourse, setFormCourse] = useState("Model Kids");
+  const [formGoal, setFormGoal] = useState("");
+  const [formSteps, setFormSteps] = useState("");
+  const [formStatus, setFormStatus] = useState("Đang hoạt động");
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -39,11 +54,30 @@ export default function AiScenariosPage() {
     fetchScenarios();
   }, []);
 
+  const handleOpenAdd = () => {
+    setFormTitle("");
+    setFormCourse("Model Kids");
+    setFormGoal("");
+    setFormSteps("");
+    setFormStatus("Đang hoạt động");
+    setIsAddModalOpen(true);
+  };
+
+  const handleOpenEdit = (sc: GuidedScenario) => {
+    setEditingScenario(sc);
+    setFormTitle(sc.title);
+    setFormCourse(sc.course);
+    setFormGoal(sc.goal);
+    setFormSteps(sc.steps.join("\n"));
+    setFormStatus(sc.status);
+    setIsEditModalOpen(true);
+  };
+
   const handleAddScenario = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
+    if (!formTitle.trim()) return;
 
-    const stepsArray = newSteps
+    const stepsArray = formSteps
       .split("\n")
       .map((s) => s.trim())
       .filter(Boolean);
@@ -53,9 +87,10 @@ export default function AiScenariosPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: newTitle.trim(),
-          course: newCourse,
-          goal: newGoal.trim() || undefined,
+          title: formTitle.trim(),
+          course: formCourse,
+          goal: formGoal.trim() || undefined,
+          status: formStatus,
           steps: stepsArray.length > 0 ? stepsArray : undefined,
         }),
       });
@@ -64,13 +99,68 @@ export default function AiScenariosPage() {
       if (res.ok && json.success) {
         setScenarios([...scenarios, json.data]);
         setIsAddModalOpen(false);
-        setNewTitle("");
-        setNewGoal("");
-        setNewSteps("");
         showToast("Tạo kịch bản tư vấn mới thành công!");
       }
     } catch (err) {
       alert("Lỗi tạo kịch bản");
+    }
+  };
+
+  const handleUpdateScenario = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingScenario || !formTitle.trim()) return;
+
+    const stepsArray = formSteps
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    try {
+      const res = await fetch("/api/ai/scenarios", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: editingScenario.code,
+          title: formTitle.trim(),
+          course: formCourse,
+          goal: formGoal.trim(),
+          status: formStatus,
+          steps: stepsArray,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setScenarios(
+          scenarios.map((s) => (s.code === editingScenario.code ? json.data : s))
+        );
+        setIsEditModalOpen(false);
+        setEditingScenario(null);
+        showToast("Đã cập nhật kịch bản thành công!");
+      } else {
+        alert(json.message || "Lỗi cập nhật");
+      }
+    } catch (err) {
+      alert("Lỗi kết nối khi cập nhật");
+    }
+  };
+
+  const handleDeleteScenario = async (code: string, title: string) => {
+    if (!confirm(`Bạn có chắc chắn muốn xóa kịch bản "${title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/ai/scenarios?code=${encodeURIComponent(code)}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setScenarios(scenarios.filter((s) => s.code !== code));
+        showToast(`Đã xóa kịch bản "${title}" thành công!`);
+      } else {
+        alert(json.message || "Lỗi khi xóa");
+      }
+    } catch (err) {
+      alert("Lỗi kết nối khi xóa");
     }
   };
 
@@ -103,7 +193,7 @@ export default function AiScenariosPage() {
 
         <button
           type="button"
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={handleOpenAdd}
           className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl shadow-md transition-all active:scale-95"
         >
           <Plus className="w-4 h-4" />
@@ -119,7 +209,7 @@ export default function AiScenariosPage() {
           >
             <div>
               <div className="flex items-center justify-between text-xs mb-2">
-                <span className="font-mono text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                   {sc.code}
                 </span>
                 <span className="text-emerald-700 font-bold text-[11px] flex items-center gap-1">
@@ -146,9 +236,25 @@ export default function AiScenariosPage() {
               <span className="font-bold text-[#DC2626] bg-red-50 px-2 py-0.5 rounded-lg border border-red-100 text-[11px]">
                 {sc.course}
               </span>
-              <span className="text-emerald-600 font-bold text-xs flex items-center gap-1">
-                Kích hoạt tự động
-              </span>
+              
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleOpenEdit(sc)}
+                  className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="Chỉnh sửa kịch bản"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteScenario(sc.code, sc.title)}
+                  className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Xóa kịch bản"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -176,71 +282,190 @@ export default function AiScenariosPage() {
 
             <form onSubmit={handleAddScenario} className="p-6 space-y-4 text-xs">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Tên kịch bản <span className="text-red-500">*</span></label>
+                <label className="font-bold text-slate-700">
+                  Tên kịch bản <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
                   placeholder="Ví dụ: Tư vấn lớp Catwalk hoa hậu nhí..."
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-slate-700">Khóa học áp dụng</label>
-                <select
-                  value={newCourse}
-                  onChange={(e) => setNewCourse(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
-                >
-                  <option value="Model Kids">Model Kids</option>
-                  <option value="Phong Thái">Phong Thái</option>
-                  <option value="Catwalk">Catwalk</option>
-                  <option value="Giao Tiếp">Giao Tiếp</option>
-                  <option value="Đa khóa học">Đa khóa học</option>
-                </select>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Khóa học áp dụng</label>
+                  <select
+                    value={formCourse}
+                    onChange={(e) => setFormCourse(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
+                  >
+                    <option value="Model Kids">Model Kids</option>
+                    <option value="Phong Thái">Phong Thái</option>
+                    <option value="Catwalk">Catwalk</option>
+                    <option value="Giao Tiếp">Giao Tiếp</option>
+                    <option value="Đa khóa học">Đa khóa học</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Trạng thái</label>
+                  <select
+                    value={formStatus}
+                    onChange={(e) => setFormStatus(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
+                  >
+                    <option value="Đang hoạt động">Đang hoạt động</option>
+                    <option value="Tạm ngưng">Tạm ngưng</option>
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Mục tiêu chính của kịch bản</label>
+                <label className="font-bold text-slate-700">Mục tiêu kịch bản</label>
                 <input
                   type="text"
-                  required
-                  value={newGoal}
-                  onChange={(e) => setNewGoal(e.target.value)}
-                  placeholder="Ví dụ: Khai thác mong muốn của phụ huynh và chốt lịch học thử..."
+                  value={formGoal}
+                  onChange={(e) => setFormGoal(e.target.value)}
+                  placeholder="Ví dụ: Khai thác tính cách bé, giới thiệu lớp học thử..."
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 flex items-center justify-between">
-                  <span>Các bước dẫn dắt (Mỗi dòng một bước) <span className="text-red-500">*</span></span>
+                <label className="font-bold text-slate-700">
+                  Các bước thực hiện (Mỗi dòng là 1 bước)
                 </label>
                 <textarea
                   rows={4}
-                  required
-                  value={newSteps}
-                  onChange={(e) => setNewSteps(e.target.value)}
-                  placeholder="Bước 1: Chào hỏi và khai thác độ tuổi&#10;Bước 2: Tìm hiểu nhu cầu và khó khăn của con&#10;Bước 3: Giới thiệu lớp học thử miễn phí&#10;Bước 4: Xin số điện thoại giữ chỗ"
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed"
+                  value={formSteps}
+                  onChange={(e) => setFormSteps(e.target.value)}
+                  placeholder="Bước 1: Chào hỏi và hỏi tuổi bé&#10;Bước 2: Tìm hiểu mục tiêu học&#10;Bước 3: Chốt hẹn học thử"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="pt-2 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
+                  className="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold"
                 >
-                  Hủy
+                  Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-md"
+                  className="px-5 py-2 text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl font-bold shadow-md"
                 >
-                  Kích Hoạt Kịch Bản Này
+                  Tạo Kịch Bản
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Edit Scenario */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 bg-[#DC2626] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Pencil className="w-5 h-5 text-white" />
+                <h3 className="font-bold text-sm tracking-tight">
+                  Chỉnh Sửa Kịch Bản Tư Vấn ({editingScenario?.code})
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-white/20 text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateScenario} className="p-6 space-y-4 text-xs">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">
+                  Tên kịch bản <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Khóa học áp dụng</label>
+                  <select
+                    value={formCourse}
+                    onChange={(e) => setFormCourse(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
+                  >
+                    <option value="Model Kids (Mẫu Nhí)">Model Kids (Mẫu Nhí)</option>
+                    <option value="Phong Thái Doanh Nhân">Phong Thái Doanh Nhân</option>
+                    <option value="Catwalk Chuyên Nghiệp">Catwalk Chuyên Nghiệp</option>
+                    <option value="Nghệ Thuật Giao Tiếp">Nghệ Thuật Giao Tiếp</option>
+                    <option value="Đa khóa học">Đa khóa học</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Trạng thái</label>
+                  <select
+                    value={formStatus}
+                    onChange={(e) => setFormStatus(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
+                  >
+                    <option value="Đang hoạt động">Đang hoạt động</option>
+                    <option value="Tạm ngưng">Tạm ngưng</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Mục tiêu kịch bản</label>
+                <input
+                  type="text"
+                  value={formGoal}
+                  onChange={(e) => setFormGoal(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">
+                  Các bước thực hiện (Mỗi dòng là 1 bước)
+                </label>
+                <textarea
+                  rows={4}
+                  value={formSteps}
+                  onChange={(e) => setFormSteps(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl font-bold shadow-md"
+                >
+                  Lưu Thay Đổi
                 </button>
               </div>
             </form>
