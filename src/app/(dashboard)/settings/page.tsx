@@ -50,9 +50,9 @@ export default function SettingsPage() {
   const [fbConfig, setFbConfig] = useState<AiConfigData>({
     apiKey: "AIzaSyB_dummy_production_gemini_key_for_ta_academy",
     selectedModel: "gemini-1.5-flash",
-    webhookUrl: "https://crm.taacademy.vn/api/webhooks/meta",
+    webhookUrl: "https://crm.taacademy.vn/api/webhook/facebook",
     verifyToken: "ta_academy_meta_verify_2026",
-    fbToken: "EAAGm0PXq1...mock_valid_page_access_token_ta_academy",
+    fbToken: "EAAXvOfcbO9ABSzhfXHzLZCH8sp4gDZB2Wre7P7MeLqltp3CEhU5kYcZAEVhjBegFPeo8z9arvburBTkuKTHqFCHZBf7gZAYUrTWxnICYQKUZAxjKGBZA6qZAJL9zejMRlVi21lQhv3vZCOUZCcTSwhcKFZCpRRCqMCxeKnZAeOWs84ewbbm9ZBXcStFj9nKO17v12kfMdaZCZCR",
     isBotActive: true,
     lastTestedAt: "Hôm nay 08:30",
     metaStatus: "connected",
