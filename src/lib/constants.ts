@@ -55,7 +55,6 @@ export const MAIN_NAVIGATION: NavigationItem[] = [
     iconName: "Bot",
     subItems: [
       { name: "Tổng quan AI", href: "/ai-training" },
-      { name: "Cấu hình AI Fanpage", href: "/ai-training/config" },
       { name: "Nhân cách AI", href: "/ai-training/persona" },
       { name: "Kho kiến thức", href: "/ai-training/knowledge" },
       { name: "Kịch bản tư vấn", href: "/ai-training/scenarios" },

@@ -13,8 +13,6 @@ import {
   ChevronDown,
   Sparkles,
   Flame,
-  ShieldCheck,
-  UserCheck,
 } from "lucide-react";
 import { MAIN_NAVIGATION, BRAND_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -88,29 +86,6 @@ export default function Sidebar() {
           <span className="text-[9px] uppercase tracking-widest text-white/80 font-medium leading-tight">
             {BRAND_CONFIG.tagline}
           </span>
-        </div>
-      </div>
-
-      {/* Role Pill Indicator */}
-      <div className="px-4 pt-3 pb-1">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/20 border border-white/10 text-white/90 text-xs">
-          {userRole === "admin" ? (
-            <>
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
-              <div className="flex flex-col">
-                <span className="font-bold text-[11px] leading-tight">Quản trị viên (Toàn quyền)</span>
-                <span className="text-[9px] text-white/70">{userName}</span>
-              </div>
-            </>
-          ) : (
-            <>
-              <UserCheck className="w-3.5 h-3.5 text-amber-300" />
-              <div className="flex flex-col">
-                <span className="font-bold text-[11px] leading-tight text-amber-100">Lễ tân (Giới hạn 4 tab)</span>
-                <span className="text-[9px] text-white/70">{userName}</span>
-              </div>
-            </>
-          )}
         </div>
       </div>
 

@@ -24,6 +24,10 @@ import {
   Clock,
   Sparkles,
   Zap,
+  Send,
+  MessageSquare,
+  ExternalLink,
+  ArrowRight,
 } from "lucide-react";
 import { CourseItem } from "@/lib/services/courseService";
 import { AiConfigData, AiZaloConfigData } from "@/lib/services/aiTrainingService";
@@ -60,6 +64,14 @@ export default function SettingsPage() {
   const [copiedFbWebhook, setCopiedFbWebhook] = useState(false);
   const [copiedFbToken, setCopiedFbToken] = useState(false);
   const [isFbSaving, setIsFbSaving] = useState(false);
+
+  // --- BỘ THỬ NGHIỆM FANPAGE & AI TƯ VẤN (SIMULATOR) ---
+  const [testCustomerName, setTestCustomerName] = useState("Phụ huynh Mai Phương");
+  const [testMessage, setTestMessage] = useState(
+    "Chào viện, bé nhà mình 7 tuổi nhút nhát và đi hơi gù lưng, có lớp Model Kids học thử cuối tuần không? Số mình 0988776655, gọi tư vấn giúp mình nhé"
+  );
+  const [isTestingWebhook, setIsTestingWebhook] = useState(false);
+  const [testWebhookResult, setTestWebhookResult] = useState<any>(null);
 
   // --- TAB 3: CẤU HÌNH AI ZALO STATE ---
   const [zaloConfig, setZaloConfig] = useState<AiZaloConfigData>({
@@ -209,6 +221,30 @@ export default function SettingsPage() {
   };
 
   // --- FB AI ACTIONS ---
+  const handleTestFanpageWebhook = async () => {
+    if (!testMessage.trim()) return;
+    try {
+      setIsTestingWebhook(true);
+      setTestWebhookResult(null);
+      const res = await fetch("/api/webhook/facebook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          senderName: testCustomerName.trim() || "Khách Facebook Test",
+          messageText: testMessage.trim(),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message);
+      setTestWebhookResult(json.data);
+      showToast("Đã bắn tin nhắn Webhook Fanpage & AI đã phản hồi!");
+    } catch (err: any) {
+      alert(err.message || "Lỗi thử nghiệm Webhook Fanpage");
+    } finally {
+      setIsTestingWebhook(false);
+    }
+  };
+
   const handleSaveFbConfig = async () => {
     try {
       setIsFbSaving(true);
@@ -563,8 +599,149 @@ export default function SettingsPage() {
                     />
                   </button>
                 </div>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Khi bật, AI An An sẽ tự động phân tích và phản hồi ngay lập tức cho phụ huynh nhắn tin vào Fanpage mà không cần nhân viên gõ tay.
+                </p>
+              </div>
+
+              {/* Hướng Dẫn Nhanh Kết Nối Fanpage Thật */}
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 text-white shadow-md space-y-3">
+                <div className="flex items-center gap-2 font-bold text-xs text-red-300 uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4 text-red-400" />
+                  <span>Cách kết nối Fanpage Thật</span>
+                </div>
+                <div className="space-y-2 text-[11px] text-slate-300 leading-relaxed">
+                  <p>
+                    <strong className="text-white">Bước 1:</strong> Mở cổng HTTPS từ máy bằng lệnh: <code className="bg-black/40 px-1 py-0.5 rounded text-amber-300">ngrok http 3000</code>
+                  </p>
+                  <p>
+                    <strong className="text-white">Bước 2:</strong> Vào <strong className="text-white">developers.facebook.com</strong> &gt; Webhooks &gt; Chọn Messenger.
+                  </p>
+                  <p>
+                    <strong className="text-white">Bước 3:</strong> Dán Callback URL: <code className="bg-black/40 px-1 py-0.5 rounded text-emerald-300">https://.../api/webhook/facebook</code> và Verify Token.
+                  </p>
+                  <p>
+                    <strong className="text-white">Bước 4:</strong> Lấy Page Access Token dán vào ô bên cạnh và bấm <strong className="text-white">Lưu cấu hình</strong>.
+                  </p>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* BỘ THỬ NGHIỆM TIN NHẮN FANPAGE & AI TƯ VẤN (LIVE SIMULATOR) */}
+          <div className="bg-white rounded-2xl p-6 border-2 border-red-200 shadow-md space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-red-50 text-[#DC2626] flex items-center justify-center">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900">
+                    BỘ THỬ NGHIỆM KẾT NỐI FANPAGE &amp; AI TƯ VẤN (LIVE TEST)
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Bắn tin nhắn giả lập từ khách hàng Facebook để kiểm tra toàn bộ luồng Webhook &rarr; Trích xuất SĐT &rarr; AI An An tư vấn tự động &rarr; Đồng bộ vào CRM
+                  </p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-[#DC2626]">
+                Thử nghiệm tức thì
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div className="md:col-span-4 space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Tên khách hàng Facebook</label>
+                <input
+                  type="text"
+                  value={testCustomerName}
+                  onChange={(e) => setTestCustomerName(e.target.value)}
+                  placeholder="VD: Phụ huynh Mai Phương"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626]"
+                />
+              </div>
+
+              <div className="md:col-span-8 space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">
+                  Nội dung tin nhắn khách gửi vào Fanpage
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={testMessage}
+                    onChange={(e) => setTestMessage(e.target.value)}
+                    placeholder="Nhập câu hỏi, số điện thoại..."
+                    className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleTestFanpageWebhook}
+                    disabled={isTestingWebhook || !testMessage.trim()}
+                    className="flex items-center gap-1.5 px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 disabled:opacity-50 shrink-0"
+                  >
+                    <Send className="w-4 h-4" />
+                    {isTestingWebhook ? "Đang xử lý AI..." : "Bắn Tin Nhắn Thử"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* KẾT QUẢ TEST THỰC TẾ */}
+            {testWebhookResult && (
+              <div className="p-4 rounded-xl bg-slate-50 border border-emerald-200 space-y-3 animate-in fade-in">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-emerald-700 font-bold text-xs">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Webhook Facebook đã tiếp nhận &amp; AI An An đã phản hồi thành công!</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href="/inbox"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#DC2626] hover:underline"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      Xem trong Hộp thư
+                    </a>
+                    <span className="text-slate-300">•</span>
+                    <a
+                      href="/consultations"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#DC2626] hover:underline"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Xem trong Quản lý khách hàng
+                    </a>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                    <span className="font-bold text-slate-500 text-[11px] uppercase tracking-wider block">
+                      Dữ liệu AI trích xuất tự động:
+                    </span>
+                    <div className="space-y-1">
+                      <p className="text-slate-700">
+                        <strong>Số điện thoại:</strong>{" "}
+                        <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          {testWebhookResult.extractedPhone || "Không có (Đang xin thêm)"}
+                        </span>
+                      </p>
+                      <p className="text-slate-700">
+                        <strong>Nhu cầu nhận diện:</strong> {testWebhookResult.extractedNeed}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-red-50/50 rounded-xl border border-red-200 space-y-1.5">
+                    <span className="font-bold text-[#DC2626] text-[11px] uppercase tracking-wider block flex items-center gap-1">
+                      <Bot className="w-3.5 h-3.5" /> Phản hồi từ AI An An (Gửi lại khách):
+                    </span>
+                    <p className="text-slate-800 italic leading-relaxed text-xs">
+                      "{testWebhookResult.aiReply}"
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
