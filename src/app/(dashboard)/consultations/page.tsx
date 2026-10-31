@@ -124,6 +124,8 @@ export default function CustomerManagementPage() {
 
   useEffect(() => {
     fetchConsultations();
+    const interval = setInterval(fetchConsultations, 8000);
+    return () => clearInterval(interval);
   }, [filterCourse, filterStatus]);
 
   useEffect(() => {

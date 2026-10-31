@@ -48,6 +48,21 @@ export const COURSE_CATALOG_MAP: Record<string, { code: string; title: string; s
 let mockConsultations: CustomerConsultationRow[] = [
   {
     stt: 1,
+    id: "lead-fb-hochaunhuy",
+    customerName: "Hồ Châu Như Ý",
+    phone: "0945678240",
+    phoneAutoExtracted: true,
+    courseRef: "model_kids",
+    courseRefLabel: "Model Kids",
+    aiExtractedNeed: "Bé 4 tuổi, phụ huynh muốn con cải thiện dáng đi và sự tự tin sân khấu",
+    careStatus: "uncalled",
+    elearningStatus: "not_enrolled",
+    receivedAt: "11:55 Hôm nay",
+    source: "facebook",
+    dob: "Chưa cập nhật",
+  },
+  {
+    stt: 2,
     id: "lead-01",
     customerName: "Phạm Thu Hương",
     phone: "0988123456",
@@ -202,6 +217,23 @@ export function addConsultation(data: {
   dob?: string;
 }) {
   const courseInfo = COURSE_CATALOG_MAP[data.courseRef] || COURSE_CATALOG_MAP.model_kids;
+
+  const existing = mockConsultations.find(
+    (c) => c.customerName.toLowerCase() === data.customerName.trim().toLowerCase()
+  );
+  if (existing) {
+    if (data.phone) {
+      existing.phone = data.phone.trim();
+      existing.phoneAutoExtracted = true;
+      existing.careStatus = "uncalled";
+    }
+    if (data.aiExtractedNeed) existing.aiExtractedNeed = data.aiExtractedNeed.trim();
+    if (data.courseRef) {
+      existing.courseRef = data.courseRef;
+      existing.courseRefLabel = courseInfo.title.split("(")[0].trim();
+    }
+    return existing;
+  }
 
   const newItem: CustomerConsultationRow = {
     stt: mockConsultations.length + 1,

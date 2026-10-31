@@ -5,6 +5,8 @@ import {
   sendInboxMessage,
 } from "@/lib/services/inboxService";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
@@ -16,7 +18,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const messages = getConversationMessages(conversationId);
+    const messages = await getConversationMessages(conversationId);
     return NextResponse.json({ success: true, data: messages });
   } catch (error: any) {
     return NextResponse.json(

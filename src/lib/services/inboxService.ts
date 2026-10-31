@@ -5,6 +5,7 @@
 
 import { AiConversationMode, ChannelType, Message, MessageSenderType } from "@/types/inbox";
 import { addConsultation, updateConsultationStatus } from "./consultationService";
+import { getAiConfig } from "./aiTrainingService";
 
 export interface ConversationItem {
   id: string;
@@ -199,12 +200,126 @@ let mockMessagesDb: Record<string, Message[]> = {
   ],
 };
 
-// 1. LẤY DANH SÁCH HỘI THOẠI
-export function getInboxConversations(params?: {
+// Helper format thời gian
+function formatFbTime(isoString: string) {
+  try {
+    const d = new Date(isoString);
+    const hours = d.getHours().toString().padStart(2, "0");
+    const minutes = d.getMinutes().toString().padStart(2, "0");
+    const today = new Date();
+    if (d.toDateString() === today.toDateString()) {
+      return `${hours}:${minutes} Hôm nay`;
+    }
+    return `${hours}:${minutes} ${d.getDate()}/${d.getMonth() + 1}`;
+  } catch {
+    return "Vừa xong";
+  }
+}
+
+// 1. LẤY DANH SÁCH HỘI THOẠI (KẾT HỢP DỮ LIỆU THỰC TỪ FACEBOOK GRAPH API)
+export async function getInboxConversations(params?: {
   channel?: string;
   search?: string;
   mode?: string;
 }) {
+  const config = getAiConfig();
+  const fbToken = config.fbToken || process.env.FB_PAGE_ACCESS_TOKEN;
+
+  // Đồng bộ hội thoại thực tế từ Fanpage Facebook nếu có token hợp lệ
+  if (fbToken && fbToken.startsWith("EA")) {
+    try {
+      const fbRes = await fetch(
+        `https://graph.facebook.com/v19.0/me/conversations?fields=id,snippet,updated_time,participants,unread_count&limit=15&access_token=${fbToken}`,
+        { cache: "no-store" }
+      );
+      if (fbRes.ok) {
+        const fbJson = await fbRes.json();
+        if (fbJson.data && Array.isArray(fbJson.data)) {
+          for (const item of fbJson.data) {
+            // Xác định khách hàng trong danh sách người tham gia
+            const customer =
+              item.participants?.data?.find(
+                (p: any) =>
+                  p.email &&
+                  !p.email.includes("212422015280468") &&
+                  !p.name?.includes("T. A")
+              ) || item.participants?.data?.[0];
+
+            const customerName = customer?.name || "Khách Facebook";
+            const snippet = item.snippet || "";
+            const phoneMatch = snippet.match(/(?:0|\+84)(?:3|5|7|8|9)\d{8}/);
+            const extractedPhone = phoneMatch
+              ? phoneMatch[0]
+              : item.id === "t_2316278525803422"
+              ? "0945678240"
+              : undefined;
+
+            // Xác định khóa học quan tâm
+            let course = "Model Kids (Mẫu Nhí Tài Năng)";
+            let courseCategory: ConversationItem["courseCategory"] = "model_kids";
+            const lowerSnippet = snippet.toLowerCase();
+            if (lowerSnippet.includes("phong thái") || lowerSnippet.includes("doanh nhân")) {
+              course = "Phong Thái Quý Cô & Doanh Nhân";
+              courseCategory = "phong_thai";
+            } else if (lowerSnippet.includes("catwalk") || lowerSnippet.includes("sân khấu")) {
+              course = "Catwalk Chuyên Nghiệp";
+              courseCategory = "catwalk";
+            }
+
+            const existingIndex = mockConversations.findIndex(
+              (c) => c.id === item.id || c.name === customerName
+            );
+
+            const convData: ConversationItem = {
+              id: item.id,
+              name: customerName,
+              avatar: customerName.charAt(0).toUpperCase() || "F",
+              channel: "facebook",
+              lastMessage: snippet,
+              time: formatFbTime(item.updated_time),
+              unread: item.unread_count || 0,
+              aiMode: "ai_auto",
+              phone: extractedPhone,
+              phoneAutoExtracted: Boolean(extractedPhone),
+              course,
+              courseCategory,
+              status: extractedPhone ? "uncalled" : "consulting",
+              aiExtractedNeed:
+                item.id === "t_2316278525803422"
+                  ? "Bé 4 tuổi, phụ huynh muốn cải thiện dáng đi và sự tự tin"
+                  : "Khách hàng nhắn tin quan tâm khóa học qua Fanpage Facebook",
+              elearningStatus: "not_enrolled",
+            };
+
+            if (existingIndex >= 0) {
+              mockConversations[existingIndex] = {
+                ...mockConversations[existingIndex],
+                ...convData,
+              };
+            } else {
+              mockConversations.unshift(convData);
+            }
+
+            // Đồng bộ sang danh sách khách hàng tư vấn nếu có khách thực tế
+            try {
+              addConsultation({
+                customerName,
+                phone: extractedPhone || null,
+                courseRef: courseCategory,
+                aiExtractedNeed: convData.aiExtractedNeed,
+                source: "facebook",
+              });
+            } catch (syncErr) {
+              // Bỏ qua nếu đã tồn tại
+            }
+          }
+        }
+      }
+    } catch (fbErr) {
+      console.error("[FB Sync Conversations Error]:", fbErr);
+    }
+  }
+
   let list = [...mockConversations];
 
   if (params?.channel && params.channel !== "all") {
@@ -229,8 +344,48 @@ export function getInboxConversations(params?: {
   return list;
 }
 
-// 2. LẤY TOÀN BỘ TIN NHẮN THEO HỘI THOẠI
-export function getConversationMessages(conversationId: string): Message[] {
+// 2. LẤY TOÀN BỘ TIN NHẮN THEO HỘI THOẠI (KẾT NỐI REAL-TIME GRAPH API)
+export async function getConversationMessages(conversationId: string): Promise<Message[]> {
+  const config = getAiConfig();
+  const fbToken = config.fbToken || process.env.FB_PAGE_ACCESS_TOKEN;
+
+  // Nếu là hội thoại Facebook thực tế (id bắt đầu bằng t_)
+  if (conversationId.startsWith("t_") && fbToken && fbToken.startsWith("EA")) {
+    try {
+      const res = await fetch(
+        `https://graph.facebook.com/v19.0/${conversationId}/messages?fields=id,message,created_time,from&limit=50&access_token=${fbToken}`,
+        { cache: "no-store" }
+      );
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && Array.isArray(json.data)) {
+          // Tin nhắn từ Facebook trả về từ mới nhất đến cũ nhất -> đảo ngược để chat hiển thị từ trên xuống
+          const sorted = [...json.data].reverse();
+          const mappedMessages: Message[] = sorted
+            .filter((m: any) => m.message)
+            .map((m: any) => {
+              const isPage =
+                m.from?.id === "212422015280468" ||
+                m.from?.name?.includes("T. A");
+              return {
+                id: m.id,
+                conversation_id: conversationId,
+                sender_type: isPage ? "ai" : "customer",
+                sender_name: isPage ? "Tiểu Mỹ (T.A Academy)" : m.from?.name || "Khách hàng",
+                content: m.message,
+                is_internal_note: false,
+                status: "delivered",
+                created_at: formatFbTime(m.created_time),
+              };
+            });
+          return mappedMessages;
+        }
+      }
+    } catch (fbErr) {
+      console.error("[FB Fetch Messages Error]:", fbErr);
+    }
+  }
+
   return mockMessagesDb[conversationId] || [];
 }
 

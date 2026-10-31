@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getInboxConversations } from "@/lib/services/inboxService";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
@@ -8,7 +10,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search") || undefined;
     const mode = searchParams.get("mode") || undefined;
 
-    const data = getInboxConversations({ channel, search, mode });
+    const data = await getInboxConversations({ channel, search, mode });
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
     return NextResponse.json(

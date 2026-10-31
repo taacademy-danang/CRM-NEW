@@ -121,12 +121,20 @@ export default function InboxPage() {
 
   useEffect(() => {
     fetchConversations();
+    const interval = setInterval(() => {
+      fetchConversations();
+    }, 6000);
+    return () => clearInterval(interval);
   }, [filterChannel]);
 
   useEffect(() => {
     if (activeConvId) {
       fetchMessages(activeConvId);
       setCopilotSuggestion(null);
+      const msgInterval = setInterval(() => {
+        fetchMessages(activeConvId);
+      }, 5000);
+      return () => clearInterval(msgInterval);
     }
   }, [activeConvId]);
 
