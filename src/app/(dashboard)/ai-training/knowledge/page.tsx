@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import { BookOpen, Upload, CheckCircle2, Clock, FileText, Check, Plus, X, Sparkles } from "lucide-react";
+import { BookOpen, Upload, CheckCircle2, Clock, FileText, Check, Plus, X, Sparkles, Edit2, Trash2 } from "lucide-react";
 import { KnowledgeDocument } from "@/lib/services/aiTrainingService";
 
 export default function AiKnowledgePage() {
@@ -13,6 +13,14 @@ export default function AiKnowledgePage() {
   const [newCategory, setNewCategory] = useState<KnowledgeDocument["category"]>("Model Kids");
   const [newSummary, setNewSummary] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingDoc, setEditingDoc] = useState<KnowledgeDocument | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCategory, setEditCategory] = useState<KnowledgeDocument["category"]>("Model Kids");
+  const [editSummary, setEditSummary] = useState("");
+  const [editVersion, setEditVersion] = useState("1.0");
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -80,6 +88,67 @@ export default function AiKnowledgePage() {
       }
     } catch (err) {
       alert("Lỗi tải lên tài liệu");
+    }
+  };
+
+  const handleOpenEdit = (doc: KnowledgeDocument) => {
+    setEditingDoc(doc);
+    setEditTitle(doc.title);
+    setEditCategory(doc.category);
+    setEditSummary(doc.contentSummary);
+    setEditVersion(doc.version);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEditDoc = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDoc || !editTitle.trim()) return;
+
+    try {
+      const res = await fetch("/api/ai/knowledge", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingDoc.id,
+          title: editTitle.trim(),
+          category: editCategory,
+          contentSummary: editSummary.trim(),
+          version: editVersion.trim(),
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setDocs((prev) => prev.map((d) => (d.id === editingDoc.id ? json.data : d)));
+        setIsEditModalOpen(false);
+        setEditingDoc(null);
+        showToast(json.message || "Đã cập nhật tài liệu thành công!");
+      } else {
+        throw new Error(json.message);
+      }
+    } catch (err: any) {
+      alert(err.message || "Lỗi cập nhật tài liệu");
+    }
+  };
+
+  const handleDeleteDoc = async (id: string, title: string) => {
+    if (!confirm(`Bạn có chắc chắn muốn xóa tài liệu "${title}" khỏi Kho kiến thức AI?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/ai/knowledge?id=${id}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setDocs((prev) => prev.filter((d) => d.id !== id));
+        showToast(`Đã xóa tài liệu "${title}" thành công!`);
+      } else {
+        throw new Error(json.message);
+      }
+    } catch (err: any) {
+      alert(err.message || "Lỗi xóa tài liệu");
     }
   };
 
@@ -169,17 +238,34 @@ export default function AiKnowledgePage() {
                   {doc.approvedBy || "--"}
                 </td>
                 <td className="px-4 py-3.5 text-right">
-                  {!doc.isApproved ? (
+                  <div className="flex items-center justify-end gap-1.5">
+                    {!doc.isApproved && (
+                      <button
+                        type="button"
+                        onClick={() => handleApprove(doc.id)}
+                        className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[11px] shadow-xs transition-colors inline-flex items-center gap-1"
+                        title="Phê duyệt đưa vào chỉ mục RAG"
+                      >
+                        <Check className="w-3 h-3" /> Duyệt
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => handleApprove(doc.id)}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs shadow-xs transition-colors inline-flex items-center gap-1"
+                      onClick={() => handleOpenEdit(doc)}
+                      className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Chỉnh sửa tài liệu"
                     >
-                      <Check className="w-3 h-3" /> Phê Duyệt RAG
+                      <Edit2 className="w-4 h-4" />
                     </button>
-                  ) : (
-                    <span className="text-emerald-700 text-xs font-semibold">Đang lập chỉ mục</span>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteDoc(doc.id, doc.title)}
+                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Xóa tài liệu khỏi kho"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -261,6 +347,99 @@ export default function AiKnowledgePage() {
                   className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-md"
                 >
                   Lưu &amp; Phân Đoạn Chunks
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Edit Document */}
+      {isEditModalOpen && editingDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Edit2 className="w-5 h-5 text-blue-400" />
+                <h3 className="font-bold text-sm tracking-tight">
+                  Chỉnh Sửa Tài Liệu Kiến Thức
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-white/20 text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditDoc} className="p-6 space-y-4 text-xs">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Tên tài liệu / Giáo trình <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  required
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Khóa học / Danh mục</label>
+                  <select
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold"
+                  >
+                    <option value="Model Kids">Model Kids</option>
+                    <option value="Phong thái">Phong thái</option>
+                    <option value="Catwalk">Catwalk</option>
+                    <option value="Giao tiếp">Giao tiếp</option>
+                    <option value="Học phí & Chính sách">Học phí &amp; Chính sách</option>
+                    <option value="Ưu đãi">Ưu đãi</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Phiên bản (Version)</label>
+                  <input
+                    type="text"
+                    value={editVersion}
+                    onChange={(e) => setEditVersion(e.target.value)}
+                    placeholder="1.0"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Tóm tắt nội dung tài liệu</label>
+                <textarea
+                  rows={4}
+                  required
+                  value={editSummary}
+                  onChange={(e) => setEditSummary(e.target.value)}
+                  placeholder="Nhập nội dung tóm tắt để hệ thống cập nhật chỉ mục vector..."
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed text-slate-800"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
+                >
+                  Lưu Thay Đổi
                 </button>
               </div>
             </form>

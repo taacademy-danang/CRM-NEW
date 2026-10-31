@@ -340,6 +340,27 @@ export function addKnowledgeDoc(data: Omit<KnowledgeDocument, "id" | "updatedAt"
   return newDoc;
 }
 
+export function updateKnowledgeDoc(
+  id: string,
+  data: Partial<Omit<KnowledgeDocument, "id" | "updatedAt">>
+) {
+  const doc = knowledgeDocsStore.find((d) => d.id === id);
+  if (!doc) throw new Error("Không tìm thấy tài liệu kiến thức");
+  if (data.title) doc.title = data.title.trim();
+  if (data.category) doc.category = data.category;
+  if (data.contentSummary !== undefined) doc.contentSummary = data.contentSummary.trim();
+  if (data.version) doc.version = data.version.trim();
+  doc.updatedAt = "Vừa xong";
+  return doc;
+}
+
+export function deleteKnowledgeDoc(id: string) {
+  const index = knowledgeDocsStore.findIndex((d) => d.id === id);
+  if (index === -1) throw new Error("Không tìm thấy tài liệu để xóa");
+  const deleted = knowledgeDocsStore.splice(index, 1)[0];
+  return deleted;
+}
+
 // 4. KỊCH BẢN TƯ VẤN (SCENARIOS)
 export function getGuidedScenarios() {
   return [...guidedScenariosStore];

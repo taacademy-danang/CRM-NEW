@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getKnowledgeDocs,
   addKnowledgeDoc,
+  updateKnowledgeDoc,
+  deleteKnowledgeDoc,
   approveKnowledgeDoc,
 } from "@/lib/services/aiTrainingService";
 
@@ -37,6 +39,52 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || "Lỗi thêm tài liệu" },
+      { status: 400 }
+    );
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id, title, category, contentSummary, version } = body;
+    if (!id) throw new Error("Thiếu ID tài liệu kiến thức");
+
+    const updated = updateKnowledgeDoc(id, {
+      title,
+      category,
+      contentSummary,
+      version,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Đã cập nhật tài liệu "${updated.title}" thành công!`,
+      data: updated,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: error.message || "Lỗi cập nhật tài liệu" },
+      { status: 400 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const searchParams = req.nextUrl.searchParams;
+    const id = searchParams.get("id");
+    if (!id) throw new Error("Thiếu ID tài liệu cần xóa");
+
+    const deleted = deleteKnowledgeDoc(id);
+    return NextResponse.json({
+      success: true,
+      message: `Đã xóa tài liệu "${deleted.title}" khỏi kho kiến thức!`,
+      data: deleted,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: error.message || "Lỗi xóa tài liệu" },
       { status: 400 }
     );
   }
