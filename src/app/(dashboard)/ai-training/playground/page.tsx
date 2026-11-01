@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import { PlayCircle, Send, Sparkles, RefreshCw, Bot, User, BookOpen, ShieldCheck } from "lucide-react";
 
@@ -10,18 +10,38 @@ interface PlaygroundMessage {
   ragSource?: string;
 }
 
+interface ScenarioOption {
+  code: string;
+  title: string;
+}
+
 export default function AiPlaygroundPage() {
-  const [scenario, setScenario] = useState("SCENARIO_MODEL_KIDS");
-  const [course, setCourse] = useState("Model Kids Nâng Cao");
+  const [scenariosList, setScenariosList] = useState<ScenarioOption[]>([]);
+  const [scenario, setScenario] = useState("");
+  const [course, setCourse] = useState("Model Kids (Mẫu Nhí)");
   const [messages, setMessages] = useState<PlaygroundMessage[]>([
     {
       role: "assistant",
-      text: "Dạ em An An xin chào Chị ạ! Em là Trợ lý tuyển sinh tại Học viện T.A Academy. Em có thể hỗ trợ thông tin gì về khóa học cho Chị và bé hôm nay ạ?",
-      ragSource: "System Persona",
+      text: "Dạ em Tiểu Mỹ xin chào Chị ạ! Em là Trợ lý AI tại Học viện T.A Academy. Em có thể hỗ trợ thông tin gì về các khóa học cho Chị và bé hôm nay ạ? ✨",
+      ragSource: "Nhân cách AI Tiểu Mỹ",
     },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/ai/scenarios")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data)) {
+          setScenariosList(json.data);
+          if (json.data.length > 0) {
+            setScenario(json.data[0].code);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const sampleQuestions = [
     "Bé nhà chị 7 tuổi hơi nhút nhát, lưng đi hơi gù thì học lớp nào?",
@@ -66,17 +86,17 @@ export default function AiPlaygroundPage() {
           ...prev,
           {
             role: "assistant",
-            text: "Dạ em An An đang kết nối lại hệ thống dữ liệu, Chị vui lòng nhắn lại giúp em nha!",
+            text: "Dạ em Tiểu Mỹ đang kết nối lại hệ thống dữ liệu, Chị vui lòng nhắn lại giúp em nha!",
             ragSource: "Fallback",
           },
         ]);
       }
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          text: "Dạ em An An xin lỗi vì sự gián đoạn mạng, Chị hỏi lại giúp em nhé ạ!",
+          text: "Dạ em Tiểu Mỹ xin lỗi vì sự gián đoạn mạng, Chị hỏi lại giúp em nhé ạ!",
           ragSource: "Error",
         },
       ]);
@@ -104,7 +124,7 @@ export default function AiPlaygroundPage() {
           <span>Phòng Thực Hành AI (Interactive Playground)</span>
         </h1>
         <p className="text-xs text-slate-500">
-          Môi trường mô phỏng thực chiến: Đóng vai Phụ huynh để thử thách và kiểm tra độ nhạy bén, tính chuẩn xác của AI trước khi kích hoạt ra ngoài Fanpage.
+          Môi trường mô phỏng thực chiến: Đóng vai Phụ huynh để thử thách và kiểm tra độ nhạy bén, tính chuẩn xác của AI Tiểu Mỹ trước khi kích hoạt ra ngoài Fanpage.
         </p>
       </div>
 
@@ -118,10 +138,15 @@ export default function AiPlaygroundPage() {
               onChange={(e) => setScenario(e.target.value)}
               className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800"
             >
-              <option value="SCENARIO_MODEL_KIDS">Tư vấn khóa Model Kids (Mẫu nhí)</option>
-              <option value="SCENARIO_PHONG_THAI">Tư vấn Phong Thái Doanh Nhân</option>
-              <option value="SCENARIO_TUITION_INQUIRY">Khách hỏi học phí</option>
-              <option value="SCENARIO_HIGH_PRICE_OBJECTION">Khách chê giá cao</option>
+              {scenariosList.length === 0 ? (
+                <option value="">Chưa có kịch bản (Đào tạo từ đầu)</option>
+              ) : (
+                scenariosList.map((sc) => (
+                  <option key={sc.code} value={sc.code}>
+                    {sc.title}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -132,7 +157,7 @@ export default function AiPlaygroundPage() {
               onChange={(e) => setCourse(e.target.value)}
               className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800"
             >
-              <option>Model Kids Nâng Cao</option>
+              <option>Model Kids (Mẫu Nhí Tài Năng)</option>
               <option>Phong Thái Quý Cô &amp; Doanh Nhân</option>
               <option>Catwalk Chuyên Nghiệp</option>
               <option>Nghệ Thuật Giao Tiếp &amp; Thuyết Trình</option>
@@ -146,8 +171,8 @@ export default function AiPlaygroundPage() {
             setMessages([
               {
                 role: "assistant",
-                text: "Dạ em An An xin chào Chị ạ! Em là Trợ lý tuyển sinh tại Học viện T.A Academy. Em có thể hỗ trợ thông tin gì về khóa học cho Chị và bé hôm nay ạ?",
-                ragSource: "System Persona",
+                text: "Dạ em Tiểu Mỹ xin chào Chị ạ! Em là Trợ lý AI tại Học viện T.A Academy. Em có thể hỗ trợ thông tin gì về các khóa học cho Chị và bé hôm nay ạ? ✨",
+                ragSource: "Nhân cách AI Tiểu Mỹ",
               },
             ])
           }
@@ -158,83 +183,91 @@ export default function AiPlaygroundPage() {
       </div>
 
       {/* Quick Testing Suggestions */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-[11px] font-bold text-slate-500 mr-1 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-[#DC2626]" /> Thử nhanh:
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        <span className="text-slate-400 font-bold whitespace-nowrap flex items-center gap-1">
+          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Thử câu hỏi mẫu:
         </span>
         {sampleQuestions.map((q, idx) => (
           <button
             key={idx}
-            type="button"
             onClick={() => handleSend(q)}
-            className="px-2.5 py-1 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 rounded-lg text-[11px] text-slate-700 hover:text-[#DC2626] font-medium transition-colors shadow-2xs"
+            className="px-3 py-1 rounded-full bg-slate-100 hover:bg-red-50 hover:text-[#DC2626] border border-slate-200 text-slate-600 whitespace-nowrap transition-colors"
           >
-            "{q}"
+            {q}
           </button>
         ))}
       </div>
 
       {/* Chat Simulation Area */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[480px]">
-        <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/60">
-          {messages.map((m, idx) => (
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col h-[520px]">
+        {/* Chat History */}
+        <div className="flex-1 p-5 overflow-y-auto space-y-4 text-xs">
+          {messages.map((msg, index) => (
             <div
-              key={idx}
-              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+              key={index}
+              className={`flex gap-3 max-w-[85%] ${
+                msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
+              }`}
             >
-              <div className="max-w-md space-y-1">
-                <div className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
-                  {m.role === "user" ? (
-                    <>
-                      <User className="w-3 h-3 text-slate-600" /> Bạn (Đóng vai Phụ huynh)
-                    </>
-                  ) : (
-                    <>
-                      <Bot className="w-3 h-3 text-[#DC2626]" /> AI An An (T.A Academy)
-                      {m.ragSource && (
-                        <span className="ml-1 px-1.5 py-0.2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-semibold flex items-center gap-0.5">
-                          <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" /> {m.ragSource}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs ${
+                  msg.role === "user" ? "bg-slate-800" : "bg-[#DC2626]"
+                }`}
+              >
+                {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              </div>
+
+              <div className="space-y-1">
                 <div
-                  className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-xs ${
-                    m.role === "user"
-                      ? "bg-slate-900 text-white rounded-br-xs font-medium"
-                      : "bg-[#DC2626] text-white rounded-bl-xs font-medium"
+                  className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
+                    msg.role === "user"
+                      ? "bg-slate-900 text-white rounded-tr-xs"
+                      : "bg-slate-100 text-slate-800 rounded-tl-xs border border-slate-200"
                   }`}
                 >
-                  {m.text}
+                  {msg.text}
                 </div>
+
+                {msg.ragSource && (
+                  <div className="flex items-center gap-1 text-[10px] text-slate-400 px-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                    <span>Nguồn: {msg.ragSource}</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
 
           {isTyping && (
-            <div className="flex justify-start">
-              <div className="p-3 bg-white border border-slate-200 rounded-2xl text-xs text-slate-600 italic flex items-center gap-2 shadow-xs">
-                <Sparkles className="w-3.5 h-3.5 text-[#DC2626] animate-spin" />
-                AI An An đang đối chiếu Kho kiến thức RAG và Thư viện tình huống...
+            <div className="flex gap-3 max-w-[85%] mr-auto">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#DC2626] text-white shrink-0">
+                <Bot className="w-4 h-4 animate-spin" />
+              </div>
+              <div className="bg-slate-100 p-3.5 rounded-2xl rounded-tl-xs border border-slate-200 text-slate-500 text-xs flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                <span>Tiểu Mỹ đang tư duy và tra cứu dữ liệu...</span>
               </div>
             </div>
           )}
         </div>
 
-        <form onSubmit={handleFormSubmit} className="p-3 bg-white border-t border-slate-200 flex gap-2">
+        {/* Input Bar */}
+        <form onSubmit={handleFormSubmit} className="p-4 border-t border-slate-100 flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Nhập câu hỏi thử thách AI (Ví dụ: 'Bé nhà chị 7 tuổi hơi nhút nhát...', 'Học phí bao nhiêu?')..."
-            className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20"
+            placeholder="Nhập câu hỏi để thử thách AI Tiểu Mỹ (ví dụ: Bé 7 tuổi nhút nhát học lớp nào?)..."
+            className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
           />
           <button
             type="submit"
-            className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 active:scale-95"
+            disabled={!input.trim() || isTyping}
+            className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#b91c1c] disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-red-500/20"
           >
-            <Send className="w-3.5 h-3.5" /> Gửi
+            <Send className="w-4 h-4" /> Gửi
           </button>
         </form>
       </div>

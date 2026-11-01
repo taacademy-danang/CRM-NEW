@@ -16,19 +16,7 @@ interface TrainingSample {
 }
 
 export default function AiConversationTrainingPage() {
-  const [samples, setSamples] = useState<TrainingSample[]>([
-    {
-      id: "train-1",
-      customerName: "Lê Mai Phương",
-      source: "Fanpage Facebook",
-      statusLabel: "Chưa tự nhiên (Nhân viên đã sửa)",
-      question: "Con chị 5 tuổi có tham gia khóa Catwalk được không em?",
-      oldAiReply: "Dạ khóa Catwalk dành cho người lớn từ 15 tuổi trở lên ạ, bé 5 tuổi không học được đâu Chị.",
-      humanCorrection:
-        "Dạ đối với các bé 5 tuổi, T.A Academy có khóa Model Kids (Mẫu nhí tài năng) được thiết kế riêng với các bài tập giải phóng hình thể và bước đi catwalk phù hợp thể chất lứa tuổi của con ạ. Em giới thiệu chi tiết khóa Model Kids cho Mẹ nha?",
-      agentName: "Nguyễn Thị Lan",
-    },
-  ]);
+  const [samples, setSamples] = useState<TrainingSample[]>([]);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingSample, setEditingSample] = useState<TrainingSample | null>(null);

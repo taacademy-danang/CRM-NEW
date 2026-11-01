@@ -6,6 +6,7 @@
 import { AiConversationMode, ChannelType, Message, MessageSenderType } from "@/types/inbox";
 import { addConsultation, updateConsultationStatus } from "./consultationService";
 import { getAiConfig } from "./aiTrainingService";
+import { upsertConversationToSupabase, insertMessageToSupabase } from "@/lib/supabase/db";
 
 export interface ConversationItem {
   id: string;
@@ -423,6 +424,37 @@ export function sendInboxMessage(data: {
   if (data.senderType === "customer") {
     extractPhoneAndNeeds(conversation, data.content);
   }
+
+  // Đồng bộ lên Supabase
+  upsertConversationToSupabase({
+    id: conversation.id,
+    name: conversation.name,
+    avatar: conversation.avatar,
+    channel: conversation.channel,
+    last_message: conversation.lastMessage,
+    time: conversation.time,
+    unread: conversation.unread,
+    ai_mode: conversation.aiMode,
+    agent_name: conversation.agentName,
+    phone: conversation.phone,
+    phone_auto_extracted: conversation.phoneAutoExtracted,
+    course: conversation.course,
+    course_category: conversation.courseCategory,
+    status: conversation.status,
+    ai_extracted_need: conversation.aiExtractedNeed,
+    elearning_status: conversation.elearningStatus,
+  }).catch((e) => console.warn("[Supabase sync conversation]", e));
+
+  insertMessageToSupabase({
+    id: newMessage.id,
+    conversation_id: newMessage.conversation_id,
+    sender_type: newMessage.sender_type,
+    sender_name: newMessage.sender_name ?? undefined,
+    content: newMessage.content,
+    is_internal_note: newMessage.is_internal_note,
+    status: newMessage.status,
+    created_at: newMessage.created_at,
+  }).catch((e) => console.warn("[Supabase sync message]", e));
 
   return { conversation, message: newMessage };
 }

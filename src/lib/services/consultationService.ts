@@ -1,7 +1,15 @@
 /**
  * CONSULTATION & CENTER STUDENT SERVICE
  * T.A Academy CRM - Quản lý Khách hàng (Đang tư vấn & Khách hàng trung tâm)
+ * Tích hợp lưu trữ trực tiếp với Supabase
  */
+
+import {
+  upsertCustomerToSupabase,
+  deleteCustomerFromSupabase,
+  upsertCenterStudentToSupabase,
+  deleteCenterStudentFromSupabase,
+} from "@/lib/supabase/db";
 
 export interface CustomerConsultationRow {
   stt: number;
@@ -125,6 +133,19 @@ export function addConsultation(data: {
       existing.courseRef = data.courseRef;
       existing.courseRefLabel = courseInfo.title.split("(")[0].trim();
     }
+
+    // Đồng bộ Supabase
+    upsertCustomerToSupabase({
+      full_name: existing.customerName,
+      phone: existing.phone,
+      source: existing.source || "facebook",
+      status: existing.careStatus,
+      course_ref: existing.courseRef,
+      ai_extracted_need: existing.aiExtractedNeed,
+      dob: existing.dob,
+      elearning_status: existing.elearningStatus,
+    }).catch((e) => console.warn("[Supabase sync customer update]", e));
+
     return existing;
   }
 
@@ -145,6 +166,19 @@ export function addConsultation(data: {
   };
 
   mockConsultations.unshift(newItem);
+
+  // Đồng bộ Supabase
+  upsertCustomerToSupabase({
+    full_name: newItem.customerName,
+    phone: newItem.phone,
+    source: newItem.source || "facebook",
+    status: newItem.careStatus,
+    course_ref: newItem.courseRef,
+    ai_extracted_need: newItem.aiExtractedNeed,
+    dob: newItem.dob,
+    elearning_status: newItem.elearningStatus,
+  }).catch((e) => console.warn("[Supabase sync new customer]", e));
+
   return newItem;
 }
 
@@ -168,12 +202,24 @@ export function updateConsultation(
   if (data.aiExtractedNeed) item.aiExtractedNeed = data.aiExtractedNeed.trim();
   if (data.careStatus) {
     item.careStatus = data.careStatus;
-    // Nếu chuyển sang trạng thái "registered" (Đã đăng ký) -> Tự động tạo học viên chính thức
     if (data.careStatus === "registered") {
       syncToCenterStudent(item);
     }
   }
   if (data.dob) item.dob = data.dob.trim();
+
+  // Đồng bộ Supabase
+  upsertCustomerToSupabase({
+    full_name: item.customerName,
+    phone: item.phone,
+    source: item.source || "facebook",
+    status: item.careStatus,
+    course_ref: item.courseRef,
+    ai_extracted_need: item.aiExtractedNeed,
+    dob: item.dob,
+    elearning_status: item.elearningStatus,
+    elearning_class: item.elearningClass,
+  }).catch((e) => console.warn("[Supabase sync update customer]", e));
 
   return item;
 }
@@ -188,7 +234,10 @@ export function updateConsultationStatus(
 export function deleteConsultation(id: string) {
   const index = mockConsultations.findIndex((c) => c.id === id);
   if (index === -1) throw new Error("Không tìm thấy khách hàng để xóa");
-  mockConsultations.splice(index, 1);
+  const [deleted] = mockConsultations.splice(index, 1);
+  if (deleted?.id) {
+    deleteCustomerFromSupabase(deleted.id).catch((e) => console.warn("[Supabase delete customer]", e));
+  }
   return { success: true };
 }
 
@@ -220,6 +269,21 @@ function syncToCenterStudent(item: CustomerConsultationRow) {
       notes: "Tự động chuyển từ Hộp thư tư vấn khi hoàn tất đăng ký",
     };
     mockCenterStudents.unshift(newStudent);
+
+    // Lưu vào bảng center_students trên Supabase
+    upsertCenterStudentToSupabase({
+      student_code: newStudent.studentCode,
+      full_name: newStudent.fullName,
+      phone: newStudent.phone,
+      dob: newStudent.dob,
+      course_code: newStudent.courseCode,
+      course_title: newStudent.courseTitle,
+      sessions: newStudent.sessions,
+      display_course: newStudent.displayCourse,
+      elearning_status: newStudent.elearningStatus,
+      elearning_class: newStudent.elearningClass,
+      notes: newStudent.notes,
+    }).catch((e) => console.warn("[Supabase sync center student]", e));
   }
 }
 
@@ -269,6 +333,22 @@ export function addCenterStudent(data: {
   };
 
   mockCenterStudents.unshift(newStudent);
+
+  // Sync to Supabase
+  upsertCenterStudentToSupabase({
+    student_code: newStudent.studentCode,
+    full_name: newStudent.fullName,
+    phone: newStudent.phone,
+    dob: newStudent.dob,
+    course_code: newStudent.courseCode,
+    course_title: newStudent.courseTitle,
+    sessions: newStudent.sessions,
+    display_course: newStudent.displayCourse,
+    elearning_status: newStudent.elearningStatus,
+    elearning_class: newStudent.elearningClass,
+    notes: newStudent.notes,
+  }).catch((e) => console.warn("[Supabase add center student]", e));
+
   return newStudent;
 }
 
@@ -294,13 +374,32 @@ export function updateCenterStudent(
   student.displayCourse = `${data.courseCode.toUpperCase()} - ${student.sessions} buổi`;
   if (data.notes !== undefined) student.notes = data.notes;
 
+  upsertCenterStudentToSupabase({
+    student_code: student.studentCode,
+    full_name: student.fullName,
+    phone: student.phone,
+    dob: student.dob,
+    course_code: student.courseCode,
+    course_title: student.courseTitle,
+    sessions: student.sessions,
+    display_course: student.displayCourse,
+    elearning_status: student.elearningStatus,
+    elearning_class: student.elearningClass,
+    notes: student.notes,
+  }).catch((e) => console.warn("[Supabase update center student]", e));
+
   return student;
 }
 
 export function deleteCenterStudent(id: string) {
   const index = mockCenterStudents.findIndex((s) => s.id === id);
   if (index === -1) throw new Error("Không tìm thấy học viên để xóa");
-  mockCenterStudents.splice(index, 1);
+  const [deleted] = mockCenterStudents.splice(index, 1);
+  if (deleted?.studentCode) {
+    deleteCenterStudentFromSupabase(deleted.studentCode).catch((e) =>
+      console.warn("[Supabase delete center student]", e)
+    );
+  }
   return { success: true };
 }
 
