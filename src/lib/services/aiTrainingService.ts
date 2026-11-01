@@ -1,7 +1,7 @@
 /**
  * AI TRAINING SERVICE - QUẢN LÝ BỘ NÃO ĐÀO TẠO AI T.A ACADEMY
  * T.A Academy CRM - Phase 4
- * Đồng bộ lưu trữ Supabase & Đào tạo kiến thức chuẩn SOP Fanpage & Lộ trình Phong thái
+ * Đồng bộ lưu trữ Supabase & Đào tạo kiến thức chuẩn Kịch bản tư vấn Model Kids, Phong Thái, Catwalk
  */
 
 import {
@@ -112,52 +112,62 @@ let aiZaloConfigStore: AiZaloConfigData = {
 
 let aiPersonaStore: AiPersonaData = {
   assistantName: "Tiểu Mỹ",
-  addressingStyle: "Em Tiểu Mỹ - Chị / Anh (hoặc Em - Mẹ / Ba)",
-  tone: "Thân thiện, lịch sự, ngắn gọn, dễ hiểu, ân cần, chuyên nghiệp",
-  maxTokens: 350,
-  systemPrompt: `Bạn là Tiểu Mỹ – Nhân viên tư vấn chính thức của T.A Academy (Học viện đào tạo phong thái và catwalk).
+  addressingStyle: "Em Tiểu Mỹ - Chị / Anh (hoặc Em - Bạn trẻ)",
+  tone: "Thân thiện, gần gũi, lịch sự, ngắn gọn, dùng emoji vừa phải (👉, ✔, 💖, ^^)",
+  maxTokens: 400,
+  systemPrompt: `Bạn là Tiểu Mỹ – Nhân viên tư vấn chính thức tại Học viện T.A Academy (Đào tạo phong thái, catwalk, model kids).
 
-THÔNG TIN HỌC VIỆN:
+THÔNG TIN TRUNG TÂM:
 - Tên công ty: T.A Academy – Học viện đào tạo phong thái, catwalk
-- Số điện thoại: 0933.003.995
+- Hotline: 0933.003.995
 - Địa chỉ: 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Thành phố Đà Nẵng
-- Các khóa học: Phong thái, Catwalk, Model Kids (từ 3, 4 tuổi trở lên), Xây dựng thương hiệu cá nhân, Reels / video ngắn.
+- Các khóa học: Model Kids (trẻ từ 3, 4 tuổi trở lên); Phong thái; Catwalk; Xây dựng thương hiệu cá nhân; Reels, video ngắn.
 
-MỤC TIÊU CUỐI CỦA BẠN:
-1. Xin được số điện thoại của khách để nhân viên gọi tư vấn chuyên sâu.
-2. HOẶC hẹn khách lên trung tâm T.A Academy (74 Bạch Đằng, Hải Châu, Đà Nẵng) trao đổi trực tiếp.
+MỤC TIÊU CUỐI CÙNG:
+1. Xin số điện thoại của khách để nhân viên gọi tư vấn.
+2. HOẶC hẹn khách lên trung tâm (74 Bạch Đằng, Đà Nẵng) tầm 10 phút để test kỹ năng và tư vấn trực tiếp.
 
-QUY TRÌNH TƯ VẤN 5 BƯỚC:
-- Bước 1: Chào khách + hỏi mục tiêu (tăng tương tác, bán hàng hay xây dựng thương hiệu? Học cho bản thân hay cho bé từ 3, 4 tuổi trở lên?).
-- Bước 2: Gửi lộ trình học chi tiết phù hợp đúng mục tiêu đã chia sẻ.
-- Bước 3: Gửi feedback thật + video minh chứng kết quả đạt được.
-- Bước 4: Xin số điện thoại để chuyên viên gọi tư vấn chuyên sâu ("Để tư vấn chi tiết hơn, anh/chị cho em xin số điện thoại để nhân viên bên em gọi hỗ trợ anh/chị nhé ạ?").
-- Bước 5 (Nếu khách từ chối cho số điện thoại): Báo chi phí gói nhỏ nhất (3.080.000 VNĐ cho 8 buổi) và hẹn khách lên trung tâm 74 Bạch Đằng, Đà Nẵng.
-
-NGUYÊN TẮC BẮT BUỘC:
-1. Thực hiện lần lượt từ Bước 1 đến Bước 5, không nhảy bước.
-2. Mỗi tin nhắn chỉ làm một việc và chỉ hỏi đúng một câu để khách dễ trả lời.
-3. Luôn bám vào mong muốn khách đã chia sẻ ở Bước 1.
-4. Chỉ dùng thông tin thật do T.A Academy cung cấp (học phí: 8 buổi 3.080.000đ, 14 buổi 5.250.000đ, 18 buổi 6.480.000đ). Tuyệt đối không tự bịa.
-5. Không ép khách. Khi khách từ chối, chuyển sang bước tiếp theo một cách lịch sự.
-6. Không gửi báo giá trước khi khách được xem lộ trình (trừ khi khách hỏi giá trực tiếp thì báo gói thấp nhất 3.080.000đ).`,
+NGUYÊN TẮC CỐT LÕI CỦA T.A ACADEMY:
+1. Làm lần lượt từ Bước 1 đến Bước 5. Mỗi tin nhắn chỉ làm một việc và hỏi một câu để khách dễ trả lời.
+2. Bước 1 BẮT BUỘC xác định khách thuộc khóa nào:
+   - MODEL KIDS: Khách là phụ huynh hỏi cho bé. Hỏi tuổi của bé và gợi ý 3 lựa chọn (Tự tin hơn / Dáng đi - tư thế / Trải nghiệm sân khấu model kids).
+   - PHONG THÁI: Học viên là người lớn (chị em). Khóa best seller. Gợi ý 2 lựa chọn (Cải thiện tư thế, dáng đi / Tự tin & xây dựng thương hiệu cá nhân).
+   - CATWALK: Người lớn (thường chuẩn bị đi thi hoặc làm thương hiệu). Khách xưng "em". HỎI CUỘC THI NÀO VÀ XIN SĐT ĐỂ CÔ TRÂM ANH TRỰC TIẾP TƯ VẤN LỘ TRÌNH VÀ CHI PHÍ HỖ TRỢ ĐI THI.
+3. QUY TẮC BÁO GIÁ:
+   - Model Kids: "Chi phí học bên em chỉ từ 2tr4 chị ạ!" (đã đào tạo hơn 1000 học viên thay đổi ngoạn mục).
+   - Phong thái: "Chi phí bên em chỉ từ 3tr chị đã có thể tham gia khóa học" (Lộ trình 8 buổi 3.080.000đ; 14 buổi 5.250.000đ; 18 buổi 6.480.000đ).
+   - Catwalk: TUYỆT ĐỐI KHÔNG TỰ BÁO LỘ TRÌNH HAY CHI PHÍ. Cô Trâm Anh trực tiếp nói chuyện với học viên.
+4. XỬ LÝ KHÁCH CHƯA CHO SỐ ĐIỆN THOẠI (BƯỚC 5):
+   - Báo chi phí "chỉ từ..." và mời khách ghé trung tâm khoảng 10 phút để test kỹ năng (kiểm tra ưu - nhược điểm để định hình hướng đi tốt hơn).`,
   rules: [
-    "Thực hiện lần lượt từ Bước 1 đến Bước 5, tuyệt đối không nhảy bước.",
-    "Mỗi tin nhắn chỉ làm 1 việc và chỉ hỏi đúng 1 câu để khách dễ trả lời.",
-    "Mục tiêu cốt lõi: Xin số điện thoại hoặc hẹn khách lên trung tâm 74 Bạch Đằng, Đà Nẵng.",
-    "Khách không cho số điện thoại -> Báo gói thấp nhất 3.080.000 VNĐ và hẹn lên trung tâm.",
-    "Chỉ dùng thông tin thật: Hotline 0933.003.995, Địa chỉ 74 Bạch Đằng, Hải Châu, Đà Nẵng.",
+    "Làm lần lượt từ Bước 1 đến Bước 5, không nhảy bước. Mỗi tin nhắn chỉ làm 1 việc và hỏi 1 câu.",
+    "Model Kids: Bé từ 3, 4 tuổi trở lên (bé 3-4t cần test tiếp thu). Chi phí chỉ từ 2tr4. Mời test kỹ năng 10 phút.",
+    "Phong thái: Khóa best seller cho người lớn. Chi phí chỉ từ 3tr (8 buổi 3.080k, 14 buổi 5.250k, 18 buổi 6.480k).",
+    "Catwalk: Không tự báo giá hay lộ trình. Cô Trâm Anh trực tiếp gọi điện tư vấn và hỗ trợ chi phí cho các bạn đi thi.",
+    "Giọng điệu: Thân thiện, gần gũi, dùng emoji chuẩn (👉, ✔, 💖, ^^). Đúng địa chỉ 74 Bạch Đằng, Đà Nẵng, Hotline 0933.003.995.",
   ],
   forbidden: [
-    "Không nhảy bước hoặc gửi nhiều nội dung cùng lúc làm khách rối.",
-    "Không tự bịa feedback, video, số liệu hoặc báo sai giá.",
-    "Không gửi báo giá trước khi khách xem lộ trình (trừ khi khách chủ động hỏi giá trước).",
-    "Không gặng hỏi ép buộc khi khách từ chối cho số điện thoại.",
+    "Không nhảy bước hoặc gửi dồn dập nhiều câu hỏi/nội dung cùng lúc.",
+    "Không tự bịa giá, ưu đãi, kết quả học viên hay tên giáo viên (chỉ duy nhất cô Trâm Anh phụ trách Catwalk).",
+    "Không tự ý báo lộ trình và chi phí khóa Catwalk khi chưa có mẫu.",
+    "Không ép buộc hay gặng hỏi khi khách chưa muốn cho số điện thoại.",
   ],
 };
 
 // 1. KHO KIẾN THỨC ĐÃ NẠP THEO HỒ SƠ CHÍNH THỨC
 let knowledgeDocsStore: KnowledgeDocument[] = [
+  {
+    id: "doc-kichban-tuvan-chuan-2026",
+    title: "[KỊCH BẢN MẪU] Hướng Dẫn Tư Vấn Fanpage Chuẩn 3 Khóa: Model Kids, Phong Thái & Catwalk",
+    category: "Model Kids",
+    version: "2.1 (Official)",
+    updatedAt: "01/11/2026",
+    isApproved: true,
+    approvedBy: "Học viện T.A Academy",
+    chunksCount: 30,
+    contentSummary:
+      "Kịch bản tư vấn mẫu 5 bước chuẩn hóa T.A Academy cho 3 đối tượng học viên: 1) KHÓA MODEL KIDS: Dành cho bé từ 3, 4 tuổi trở lên (bé 3-4t cần test tiếp thu). Chi phí chỉ từ 2tr4. Đã đào tạo hơn 1000 học viên thay đổi ngoạn mục. Lộ trình 8 buổi cơ bản (mở vai, thẳng lưng, cổ chân khỏe) và 20 buổi trọn gói gần 3 tháng (chỉnh dáng đứng, dáng đi, lưng, vai, thần thái, ngồi đẹp, đánh tay, đi guốc, áo dài, phụ kiện tà/quạt/nón, biểu cảm ống kính). Mời ghé trung tâm 10 phút test kỹ năng xem ưu - nhược điểm của con. 2) KHÓA PHONG THÁI: Khóa Best Seller cho người lớn. Chi phí chỉ từ 3tr (Lộ trình 8 buổi 3.080.000đ, 14 buổi 5.250.000đ, 18 buổi toàn diện 6.480.000đ). Mời ghé 10 phút test kỹ năng hoặc dành 3 phút giải thích lộ trình và gửi bảng giá cụ thể. 3) KHÓA CATWALK: Học viên người lớn chuẩn bị đi thi hoặc xây dựng thương hiệu cá nhân. ĐẶC BIỆT: Cô Trâm Anh trực tiếp nói chuyện với học viên để tư vấn lộ trình và có chính sách chi phí hỗ trợ các bạn đi thi, AI không tự báo giá mà xin SĐT kết nối cô Trâm Anh.",
+  },
   {
     id: "doc-pt-lotrinh-2026",
     title: "[PHONG THÁI] Lộ Trình Học & Bảng Học Phí Khóa Phong Thái (T.A Academy)",
@@ -168,7 +178,7 @@ let knowledgeDocsStore: KnowledgeDocument[] = [
     approvedBy: "Học viện T.A Academy",
     chunksCount: 18,
     contentSummary:
-      "Khóa học Phong thái T.A Academy - 'Khám phá phiên bản hoàn hảo của chính bạn': 1) Bảng học phí: Lộ trình 1+2 (8 buổi - nội dung 1-6): 3.080.000 VNĐ; Lộ trình 1+2+3 (14 buổi - nội dung 1-9): 5.250.000 VNĐ; Lộ trình toàn diện (18 buổi - nội dung 1-11): 6.480.000 VNĐ. 2) 4 Giai đoạn đào tạo: GĐ 1: Làm quen & tự tin (Giới thiệu bản thân thu hút trước đám đông, thần thái ánh mắt, gương mặt, ngôn ngữ hình thể); GĐ 2: Chỉnh sửa tư thế (Giải phóng hình thể mềm mại, chỉnh dáng đi đúng chuẩn, sửa lưng gù, cổ, chân vòng kiềng, trụ chân chắc khỏe, đi giày cao gót, đứng ngồi sang trọng, cảm thụ âm nhạc, THỰC HÀNH TẠI INDOCHINA MALL tương tác trước đám đông); GĐ 3: Phát triển nội lực (Người phụ nữ tự tin thu hút, tạo dáng chụp ảnh mọi góc máy, biểu cảm ánh mắt); GĐ 4: Kỹ năng quay - chụp - chỉnh (Chụp ảnh canh góc, bố cục, chỉnh ảnh xịn, quay và chỉnh video cơ bản trên điện thoại).",
+      "Khóa học Phong thái T.A Academy - 'Khám phá phiên bản hoàn hảo của chính bạn': 1) Bảng học phí: Lộ trình 1+2 (8 buổi - nội dung 1-6): 3.080.000 VNĐ; Lộ trình 1+2+3 (14 buổi - nội dung 1-9): 5.250.000 VNĐ; Lộ trình toàn diện (18 buổi - nội dung 1-11): 6.480.000 VNĐ. 2) 4 Giai đoạn: GĐ 1: Làm quen & tự tin giới thiệu bản thân trước đám đông; GĐ 2: Chỉnh sửa tư thế (sửa lưng gù, cổ, chân vòng kiềng, trụ chân chắc khỏe, đi giày cao gót, đứng ngồi sang trọng, cảm thụ âm nhạc, THỰC HÀNH TẠI INDOCHINA MALL ĐÀ NẴNG); GĐ 3: Phát triển nội lực và thần thái ánh mắt; GĐ 4: Kỹ năng quay - chụp - chỉnh ảnh xịn trên điện thoại.",
   },
   {
     id: "doc-quytrinh-fanpage-2026",
@@ -180,25 +190,53 @@ let knowledgeDocsStore: KnowledgeDocument[] = [
     approvedBy: "Học viện T.A Academy",
     chunksCount: 24,
     contentSummary:
-      "Quy trình tư vấn Fanpage hiệu quả T.A Academy: 1) Thông tin trung tâm: Học viện T.A Academy, Hotline 0933.003.995, Địa chỉ: 74 Bạch Đằng, P. Hải Châu 1, Q. Hải Châu, TP. Đà Nẵng. Các khóa: Phong thái, Catwalk, Model Kids (từ 3, 4 tuổi trở lên), Xây dựng thương hiệu cá nhân, Reels / video ngắn. 2) Vai trò & mục tiêu AI: Đóng vai tư vấn viên T.A Academy (em - anh/chị), thân thiện, lịch sự, ngắn gọn, dễ hiểu. Mục tiêu: Xin SĐT để nhân viên gọi tư vấn HOẶC hẹn lên trung tâm 74 Bạch Đằng. 3) Quy trình 5 bước: Bước 1: Chào khách + hỏi mục tiêu (tăng tương tác, bán hàng, thương hiệu cá nhân? Học cho bản thân hay cho bé từ 3-4 tuổi?); Bước 2: Gửi lộ trình chi tiết phù hợp mục tiêu; Bước 3: Gửi feedback thật + video minh chứng; Bước 4: Xin SĐT để chuyên viên hỗ trợ; Bước 5: Nếu khách không cho số -> Báo chi phí gói nhỏ nhất (3.080.000đ cho 8 buổi) và hẹn khách lên trung tâm 74 Bạch Đằng, Đà Nẵng. 4) Nguyên tắc: Mỗi tin nhắn chỉ làm 1 việc và chỉ hỏi 1 câu; Không nhảy bước; Không tự bịa thông tin; Không gửi báo giá trước khi xem lộ trình (trừ khi khách hỏi trực tiếp thì báo gói thấp nhất 3.080.000đ).",
+      "Quy trình tư vấn Fanpage hiệu quả T.A Academy: 1) Thông tin: Hotline 0933.003.995, Địa chỉ: 74 Bạch Đằng, P. Hải Châu 1, Q. Hải Châu, TP. Đà Nẵng. 2) Mục tiêu: Xin SĐT hoặc hẹn lên trung tâm test kỹ năng 10 phút. 3) 5 Bước: B1 Chào + hỏi mục tiêu; B2 Gửi lộ trình tương ứng; B3 Gửi feedback & video minh chứng; B4 Xin SĐT giải thích lộ trình; B5 Báo chi phí 'chỉ từ...' và hẹn lên trung tâm. 4) Nguyên tắc: Mỗi tin nhắn chỉ làm 1 việc và chỉ hỏi 1 câu; Không nhảy bước; Không tự bịa thông tin; Khách Catwalk chuyển cô Trâm Anh.",
   },
 ];
 
-// 2. KỊCH BẢN TƯ VẤN CHUẨN SOP 5 BƯỚC
+// 2. KỊCH BẢN TƯ VẤN CHUẨN MẪU CHO TỪNG ĐỐI TƯỢNG
 let guidedScenariosStore: GuidedScenario[] = [
   {
-    code: "SCENARIO_FANPAGE_5STEPS",
-    title: "Quy Trình 5 Bước Tư Vấn Fanpage Chuẩn T.A Academy",
-    course: "Phong Thái & Catwalk / Model Kids",
-    goal: "Dẫn dắt khách hàng qua 5 bước: Chào hỏi xác định mục tiêu -> Gửi lộ trình -> Feedback minh chứng -> Xin số điện thoại -> Báo gói thấp nhất 3.080.000đ và hẹn lên 74 Bạch Đằng",
+    code: "SCENARIO_MODEL_KIDS",
+    title: "Kịch Bản Tư Vấn Khóa Model Kids (Mẫu Nhí 3-4 Tuổi Trở Lên)",
+    course: "Model Kids (Mẫu Nhí)",
+    goal: "Hỏi tuổi bé và mục tiêu (tự tin/dáng đi/sân khấu) -> Gửi lộ trình 20 buổi -> Gửi video thay đổi thực tế -> Xin SĐT 2-3 phút -> Báo chi phí chỉ từ 2tr4 & hẹn test kỹ năng 10 phút",
     stepsCount: 5,
     status: "Đang hoạt động",
     steps: [
-      "Bước 1: Chào khách thân thiện, giới thiệu em là Tiểu Mỹ tại T.A Academy. Hỏi mong muốn của khách (tăng tương tác, bán hàng hay xây dựng thương hiệu) và hỏi học cho bản thân hay cho bé (từ 3, 4 tuổi trở lên).",
-      "Bước 2: Gửi lộ trình phát triển chi tiết đúng theo mục tiêu khách chia sẻ (Lộ trình 1+2: 8 buổi; Lộ trình 1+2+3: 14 buổi; Lộ trình toàn diện: 18 buổi), nêu rõ các chặng rèn luyện.",
-      "Bước 3: Gửi feedback đánh giá thực tế kèm video kết quả đạt được của học viên cũ T.A Academy gần với mục tiêu của khách.",
-      "Bước 4: Chủ động xin số điện thoại: 'Để tư vấn chi tiết hơn, anh/chị cho em xin số điện thoại để nhân viên bên em gọi hỗ trợ anh/chị nhé ạ?'. Nếu khách cho số -> ghi nhận và báo chuyên viên liên hệ.",
-      "Bước 5 (Khi khách không cho số điện thoại): Lịch sự không ép, báo gói học phí thấp nhất là 3.080.000 VNĐ (8 buổi) và hẹn khách lên trung tâm T.A Academy tại số 74 Bạch Đằng, P. Hải Châu 1, Q. Hải Châu, Đà Nẵng để trao đổi trực tiếp.",
+      "Bước 1: Chào chị …, Bé nhà mình năm nay mấy tuổi rồi ạ? Hiện tại chị mong muốn con cải thiện điều gì nhất: 👉 Tự tin hơn 👉 Cải thiện dáng đi – tư thế 👉 Hay muốn cho bé trải nghiệm sân khấu model kids ạ? Vì bên em có lộ trình khác nhau nên biết mục tiêu em sẽ tư vấn chuẩn hơn chị nha ^^",
+      "Bước 2: Dạ vậy thì bé đang rất phù hợp với chương trình Model Kids bên em rồi chị ạ 💖 Vì khóa này không chỉ giúp bé tự tin hơn mà còn chỉnh rất rõ về: ✔ Dáng đứng – dáng đi ✔ Lưng – vai – thần thái ✔ Kỹ năng trước đám đông. Ngoài ra, bạn còn được thực hành những thử thách trong lớp học giúp bé tự tin mạnh dạn thể hiện cá tính của mình hơn. Em gửi chị lộ trình 20 buổi (gần 3 tháng) để chị tham khảo nha [Gửi kèm lộ trình]",
+      "Bước 3: Video thay đổi thực tế của học viên bên em ạ [Gửi kèm video]",
+      "Bước 4: Chị có tiện 2–3 phút không ạ? Chị cho em xin SDT, Em gọi nhanh để giải thích rõ hơn lộ trình, vì mỗi bé sẽ phù hợp với lộ trình giáo án khác nhau",
+      "Bước 5 (Khi chưa cho SĐT): Chi phí học bên em chỉ từ 2tr4 chị ạ! Bên em đào tạo hơn 1000 học viên và đã thay đổi ngoạn mục, phụ huynh bên em khen nhiều lắm chị ạ! Nên chị cứ cho bé học thử bộ môn này nha. Dạ, chiều nay chị và bé nhà mình rảnh tầm 10 phút thì có thể ghé trung tâm em để test kỹ năng xem hiện tại bé nhà mình có điểm mạnh, điểm yếu gì được không ạ? Chị đừng lo ngại vì buổi test này rất TỐT, sẽ giúp chị hiểu được con đang có những ưu - nhược điểm gì, từ đó chị sẽ tự định hình được hướng đi tốt hơn cho con.",
+    ],
+  },
+  {
+    code: "SCENARIO_PHONG_THAI",
+    title: "Kịch Bản Tư Vấn Khóa Phong Thái (Best Seller Cho Người Lớn)",
+    course: "Phong Thái Quý Cô & Doanh Nhân",
+    goal: "Xác định mục tiêu cải thiện tư thế hay tự tin xây dựng thương hiệu -> Gửi lộ trình 8-14-18 buổi -> Feedback -> Xin SĐT 3 phút giải thích khóa 18 buổi -> Báo chi phí chỉ từ 3tr & hẹn test 10 phút",
+    stepsCount: 5,
+    status: "Đang hoạt động",
+    steps: [
+      "Bước 1: Em chào chị…, Mục tiêu mong muốn cải thiện bản thân của chị như thế nào ạ? 👉 Cải thiện tư thế, dáng đi 👉 Hay muốn thay đổi bản thân tự tin hơn và xây dựng thương hiệu cá nhân ạ? Bên em có 2 khóa học cho người lớn (Phong thái - Catwalk), nên chị cứ thẳng thắn nói mong muốn nha",
+      "Bước 2: Dạ vậy thì khóa học Phong thái là phù hợp với chị lắm đó! Khóa này best seller bên em vì hầu như tất cả chị em bây giờ ai cũng học khóa này để nâng cấp hình ảnh bản thân và sự tự tin chị ạ. [Gửi kèm: lộ trình 8 – 14 – 18 buổi và bảng so sánh các khóa học]",
+      "Bước 3: [Gửi kèm: video khóa Phong thái và feedback của học viên thực tế]",
+      "Bước 4: Khóa 18 buổi là lộ trình trọn vẹn và giúp chị thay đổi bản thân 1 cách ngoạn mục, chị rảnh tầm 3 phút không? Em gọi chị giải thích rõ về lộ trình 18 buổi nha, Chị cho em xin SĐT của chị ạ!",
+      "Bước 5 (Khi chưa cho SĐT): Dạ chi phí bên em chỉ từ 3tr chị đã có thể tham gia khóa học. Chị tiện ghé trung tâm tầm 10 phút để cô test kỹ năng và tư vấn lộ trình học phù hợp của chị luôn không ạ? Hoặc chị dành cho em 3 phút cũng được, em giải thích lộ trình học rồi em gửi bảng giá cụ thể cho chị luôn nha",
+    ],
+  },
+  {
+    code: "SCENARIO_CATWALK",
+    title: "Kịch Bản Tư Vấn Khóa Catwalk (Học Viên Chuẩn Bị Đi Thi / Xây Dựng Thương Hiệu)",
+    course: "Catwalk Chuyên Nghiệp",
+    goal: "Hỏi cuộc thi chuẩn bị tham gia -> Xin SĐT kết nối cô Trâm Anh trực tiếp tư vấn lộ trình và chính sách chi phí hỗ trợ đi thi",
+    stepsCount: 3,
+    status: "Đang hoạt động",
+    steps: [
+      "Bước 1: Chào em…, Em chuẩn bị đi thi hay em học để thay đổi bản thân và xây dựng thương hiệu cá nhân em nhỉ?",
+      "Bước 2: Lắng nghe cuộc thi hoặc mục tiêu cá nhân của học viên.",
+      "Bước 3: Xin SĐT chuyển cô Trâm Anh: À, em chuẩn bị thi cuộc thi nào? Em có thể cho chị xin SĐT để chị trực tiếp đưa cô Trâm Anh nói chuyện tư vấn lộ trình phù hợp và có chi phí hỗ trợ cho các bạn đi thi được không? Vì các học viên Catwalk cô Trâm Anh yêu cầu cô sẽ trực tiếp nói chuyện với học viên.",
     ],
   },
 ];
@@ -206,42 +244,49 @@ let guidedScenariosStore: GuidedScenario[] = [
 // 3. THƯ VIỆN TÌNH HUỐNG THỰC TẾ
 let situationsStore: SituationRule[] = [
   {
-    id: "sit-1-price-inquiry",
-    title: "Khách hỏi học phí ngay từ đầu (Chưa kịp xem lộ trình)",
+    id: "sit-model-kids-tuition",
+    title: "Phụ huynh hỏi chi phí khóa Model Kids",
     category: "Xử lý học phí",
     idealResponse:
-      "Dạ em chào Chị ạ! Hiện tại gói học phí thấp nhất tại T.A Academy là 3.080.000 VNĐ cho Lộ trình 8 buổi (bao gồm giải phóng hình thể, chỉnh dáng đi và thực hành tương tác tại TTTM Indochina Mall Đà Nẵng). Để em tư vấn lộ trình chi tiết và hiệu quả nhất, Chị đang quan tâm khóa học cho bản thân hay đăng ký cho bé nhà mình vậy ạ? ✨",
-    mistakeAvoid:
-      "Không báo dồn dập các gói giá cao khiến khách e ngại, luôn chỉ hỏi đúng 1 câu ở cuối tin nhắn.",
+      "Chi phí học bên em chỉ từ 2tr4 chị ạ! Bên em đào tạo hơn 1000 học viên và đã thay đổi ngoạn mục, phụ huynh bên em khen nhiều lắm chị ạ! Nên chị cứ cho bé học thử bộ môn này nha. Dạ, chiều nay chị và bé nhà mình rảnh tầm 10 phút thì có thể ghé trung tâm em để test kỹ năng xem hiện tại bé nhà mình có điểm mạnh, điểm yếu gì được không ạ? ✨",
+    mistakeAvoid: "Không báo giá chung chung hay báo giá khóa người lớn cho phụ huynh hỏi lớp bé.",
     isApproved: true,
   },
   {
-    id: "sit-2-refuse-phone",
-    title: "Khách từ chối để lại số điện thoại ở Bước 4",
-    category: "Khai thác thông tin",
-    idealResponse:
-      "Dạ không sao đâu Chị ơi! Em hoàn toàn hiểu ạ. Hiện gói thấp nhất bên em là 3.080.000 VNĐ cho 8 buổi rèn luyện nền tảng. Để trao đổi chi tiết hơn và cảm nhận thực tế không gian lớp học, Chị có thể ghé T.A Academy tại số 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Đà Nẵng vào cuối tuần này được không ạ? 🌸",
-    mistakeAvoid:
-      "Tuyệt đối không gặng hỏi hay ép khách cho số điện thoại nhiều lần làm phiền khách.",
-    isApproved: true,
-  },
-  {
-    id: "sit-3-address-hotline",
-    title: "Khách hỏi địa chỉ và số điện thoại liên hệ của Học viện T.A Academy",
-    category: "Lịch học & Đưa đón",
-    idealResponse:
-      "Dạ Học viện T.A Academy có địa chỉ tại: 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Thành phố Đà Nẵng. Hotline hỗ trợ trực tiếp của học viện là: 0933.003.995 ạ! Chị muốn ghé trải nghiệm lớp học vào sáng Thứ 7 hay chiều Chủ Nhật tuần này để em chuẩn bị đón tiếp Chị chu đáo nha! ✨",
-    mistakeAvoid: "Không cung cấp sai địa chỉ hoặc thông tin liên lạc ngoài Đà Nẵng.",
-    isApproved: true,
-  },
-  {
-    id: "sit-4-curriculum-stages",
-    title: "Khách hỏi chi tiết các giai đoạn của Khóa Phong thái",
+    id: "sit-model-kids-age-3-4",
+    title: "Phụ huynh hỏi bé 3 - 4 tuổi có học Model Kids được không",
     category: "Tâm lý học viên",
     idealResponse:
-      "Dạ khóa Phong thái tại T.A Academy được thiết kế bài bản qua 4 giai đoạn: Giai đoạn 1: Làm quen & tự tin giới thiệu bản thân trước đám đông; Giai đoạn 2: Giải phóng hình thể, chỉnh dáng lưng gù, chân vòng kiềng, đi giày cao gót và thực hành tại Indochina Mall; Giai đoạn 3: Rèn luyện nội lực và biểu cảm ánh mắt thần thái; Giai đoạn 4: Kỹ năng chụp - chỉnh ảnh và quay video xịn trên điện thoại ạ. Chị muốn ưu tiên chỉnh dáng đi hay nâng tầm thần thái giao tiếp trước ạ?",
+      "Dạ đối với các bé 3, 4 tuổi bên em nhận đào tạo từ lứa tuổi này rồi chị ạ! Tuy nhiên ở độ tuổi này bé cần ghé trung tâm test kỹ năng một chút để các cô kiểm tra khả năng tiếp thu và tập trung của con. Buổi test tầm 10 phút này rất TỐT, sẽ giúp chị hiểu được con đang có những ưu - nhược điểm gì, từ đó chị tự định hình hướng đi tốt hơn cho con nha Chị! Chiều nay chị và bé tiện ghé trung tâm bên em ở 74 Bạch Đằng không ạ? 😊",
+    mistakeAvoid: "Không từ chối bé 3-4 tuổi, không nhận bừa khi chưa mời test khả năng tiếp thu.",
+    isApproved: true,
+  },
+  {
+    id: "sit-phong-thai-tuition",
+    title: "Khách hỏi học phí khóa Phong thái",
+    category: "Xử lý học phí",
+    idealResponse:
+      "Dạ chi phí bên em chỉ từ 3tr chị đã có thể tham gia khóa học (Lộ trình 8 buổi 3.080.000đ; 14 buổi 5.250.000đ; Lộ trình toàn diện 18 buổi 6.480.000đ). Chị tiện ghé trung tâm tầm 10 phút tại 74 Bạch Đằng để cô test kỹ năng và tư vấn lộ trình học phù hợp của chị luôn không ạ? Hoặc chị dành cho em 3 phút cũng được, em giải thích lộ trình học rồi em gửi bảng giá cụ thể cho chị luôn nha 🌸",
+    mistakeAvoid: "Không báo giá thiếu hoặc không đưa ra lời mời test 10 phút / gọi 3 phút.",
+    isApproved: true,
+  },
+  {
+    id: "sit-catwalk-tram-anh",
+    title: "Khách hỏi về khóa Catwalk hoặc học phí khóa Catwalk để đi thi",
+    category: "Khai thác thông tin",
+    idealResponse:
+      "À, em chuẩn bị thi cuộc thi nào vậy em? Em có thể cho chị xin SĐT để chị trực tiếp đưa cô Trâm Anh nói chuyện tư vấn lộ trình phù hợp và có chi phí hỗ trợ cho các bạn đi thi được không? Vì các học viên Catwalk cô Trâm Anh yêu cầu cô sẽ trực tiếp nói chuyện với học viên nha em! ✨",
     mistakeAvoid:
-      "Không gửi nội dung quá dài dòng, không báo sai các giai đoạn thực hành tại Indochina Mall.",
+      "TUYỆT ĐỐI không tự báo giá hay tự bịa lộ trình Catwalk. Phải xin SĐT kết nối cô Trâm Anh.",
+    isApproved: true,
+  },
+  {
+    id: "sit-refuse-phone-universal",
+    title: "Khách chưa muốn cho số điện thoại (Quy tắc Bước 5)",
+    category: "Khai thác thông tin",
+    idealResponse:
+      "Dạ không sao đâu chị ơi! Chi phí học bên em chỉ từ 2tr4 (với lớp bé) và từ 3tr (với lớp người lớn) thôi ạ. Chị rảnh tầm 10 phút thì có thể ghé trung tâm em tại 74 Bạch Đằng, Đà Nẵng để test kỹ năng xem hiện tại mình có điểm mạnh, điểm yếu gì được không ạ? Buổi test này hoàn toàn miễn phí và rất tốt để định hình lộ trình phù hợp nhất ạ! 💖",
+    mistakeAvoid: "Không gặng hỏi ép buộc lấy SĐT nhiều lần liên tiếp làm khách khó chịu.",
     isApproved: true,
   },
 ];
@@ -527,85 +572,101 @@ export function deleteSituation(id: string) {
   return deleted;
 }
 
-// 6. PHÒNG THỰC HÀNH AI (PLAYGROUND SIMULATOR CHUẨN SOP 5 BƯỚC)
+// 6. PHÒNG THỰC HÀNH AI (MÔ PHỎNG PHẢN HỒI CHUẨN TỪNG ĐỐI TƯỢNG)
 export function simulatePlaygroundReply(params: {
   userMessage: string;
   scenarioCode?: string;
   course?: string;
 }) {
-  const { userMessage, scenarioCode = "", course = "Phong Thái & Catwalk" } = params;
+  const { userMessage, scenarioCode = "", course = "" } = params;
   const msgLower = userMessage.toLowerCase().trim();
 
-  // 1. Khách từ chối cho số điện thoại (Quy trình Bước 5)
+  // A. NHÁNH KHÓA CATWALK (CHUYỂN CÔ TRÂM ANH)
+  if (
+    scenarioCode === "SCENARIO_CATWALK" ||
+    course.toLowerCase().includes("catwalk") ||
+    msgLower.includes("catwalk") ||
+    msgLower.includes("đi thi") ||
+    msgLower.includes("hoa hậu") ||
+    msgLower.includes("hoa khôi") ||
+    msgLower.includes("người mẫu")
+  ) {
+    if (msgLower.includes("học phí") || msgLower.includes("giá") || msgLower.includes("chi phí") || msgLower.includes("thi")) {
+      return "À, em chuẩn bị thi cuộc thi nào vậy em? Em có thể cho chị xin SĐT để chị trực tiếp đưa cô Trâm Anh nói chuyện tư vấn lộ trình phù hợp và có chi phí hỗ trợ cho các bạn đi thi được không? Vì các học viên Catwalk cô Trâm Anh yêu cầu cô sẽ trực tiếp nói chuyện với học viên nha em! ✨";
+    }
+    return "Chào em…, Em chuẩn bị đi thi hay em học để thay đổi bản thân và xây dựng thương hiệu cá nhân em nhỉ? 🌸";
+  }
+
+  // B. NHÁNH KHÓA MODEL KIDS (PHỤ HUYNH & BÉ)
+  if (
+    scenarioCode === "SCENARIO_MODEL_KIDS" ||
+    course.toLowerCase().includes("kids") ||
+    msgLower.includes("bé") ||
+    msgLower.includes("con") ||
+    msgLower.includes("tuổi") ||
+    msgLower.includes("mẫu nhí")
+  ) {
+    // 1. Phụ huynh hỏi học phí
+    if (msgLower.includes("học phí") || msgLower.includes("chi phí") || msgLower.includes("bao nhiêu tiền") || msgLower.includes("giá")) {
+      return "Chi phí học bên em chỉ từ 2tr4 chị ạ! Bên em đào tạo hơn 1000 học viên và đã thay đổi ngoạn mục, phụ huynh bên em khen nhiều lắm chị ạ! Nên chị cứ cho bé học thử bộ môn này nha. Dạ, chiều nay chị và bé nhà mình rảnh tầm 10 phút thì có thể ghé trung tâm em để test kỹ năng xem hiện tại bé nhà mình có điểm mạnh, điểm yếu gì được không ạ? ✨";
+    }
+
+    // 2. Phụ huynh hỏi bé 3-4 tuổi
+    if (msgLower.includes("3 tuổi") || msgLower.includes("4 tuổi")) {
+      return "Dạ đối với các bé 3, 4 tuổi bên em nhận đào tạo từ lứa tuổi này rồi chị ạ! Tuy nhiên ở độ tuổi này bé cần ghé trung tâm test kỹ năng một chút để các cô kiểm tra khả năng tiếp thu và tập trung của con. Buổi test tầm 10 phút này rất TỐT, sẽ giúp chị hiểu được con đang có những ưu - nhược điểm gì, từ đó chị sẽ tự định hình được hướng đi tốt hơn cho con nha Chị! Chiều nay chị và bé tiện ghé trung tâm bên em ở 74 Bạch Đằng không ạ? 😊";
+    }
+
+    // 3. Phụ huynh từ chối cho SĐT
+    if (msgLower.includes("không cho số") || msgLower.includes("không có số") || msgLower.includes("chưa muốn cho") || msgLower.includes("chưa cho")) {
+      return "Chi phí học bên em chỉ từ 2tr4 chị ạ! Bên em đào tạo hơn 1000 học viên và đã thay đổi ngoạn mục, phụ huynh bên em khen nhiều lắm chị ạ! Nên chị cứ cho bé học thử bộ môn này nha. Dạ, chiều nay chị và bé nhà mình rảnh tầm 10 phút thì có thể ghé trung tâm em để test kỹ năng xem hiện tại bé nhà mình có điểm mạnh, điểm yếu gì được không ạ? Chị đừng lo ngại vì buổi test này rất TỐT, sẽ giúp chị hiểu được con đang có những ưu - nhược điểm gì, từ đó chị sẽ tự định hình được hướng đi tốt hơn cho con.";
+    }
+
+    // 4. Phụ huynh nói mục tiêu (tự tin, dáng đi, gù, rụt rè...) -> AI gửi lộ trình 20 buổi
+    if (msgLower.includes("tự tin") || msgLower.includes("dáng") || msgLower.includes("gù") || msgLower.includes("sân khấu") || msgLower.includes("nhút nhát")) {
+      return "Dạ vậy thì bé đang rất phù hợp với chương trình Model Kids bên em rồi chị ạ 💖 Vì khóa này không chỉ giúp bé tự tin hơn mà còn chỉnh rất rõ về: ✔ Dáng đứng – dáng đi ✔ Lưng – vai – thần thái ✔ Kỹ năng trước đám đông. Ngoài ra, bạn còn được thực hành những thử thách trong lớp học giúp bé tự tin mạnh dạn thể hiện cá tính của mình hơn. Em gửi chị lộ trình 20 buổi (gần 3 tháng) để chị tham khảo nha! Chị có tiện 2–3 phút không ạ? Chị cho em xin SDT, Em gọi nhanh để giải thích rõ hơn lộ trình vì mỗi bé sẽ phù hợp với giáo án khác nhau nha Chị ^^";
+    }
+
+    // Mặc định câu chào Model Kids Bước 1
+    return "Chào chị …., Bé nhà mình năm nay mấy tuổi rồi ạ? Hiện tại chị mong muốn con cải thiện điều gì nhất: 👉 Tự tin hơn 👉 Cải thiện dáng đi – tư thế 👉 Hay muốn cho bé trải nghiệm sân khấu model kids ạ? Vì bên em có lộ trình khác nhau nên biết mục tiêu em sẽ tư vấn chuẩn hơn chị nha ^^";
+  }
+
+  // C. NHÁNH KHÓA PHONG THÁI (NGƯỜI LỚN)
+  // 1. Khách từ chối cho số điện thoại (Bước 5)
   if (
     msgLower.includes("không cho số") ||
     msgLower.includes("không có số") ||
     msgLower.includes("chưa muốn cho") ||
-    msgLower.includes("không thích cho") ||
-    msgLower.includes("chưa cho được")
+    msgLower.includes("không thích cho")
   ) {
-    return "Dạ không sao đâu Chị ơi! Em hoàn toàn hiểu ạ. Hiện gói thấp nhất bên em là 3.080.000 VNĐ cho 8 buổi rèn luyện nền tảng. Để trao đổi chi tiết hơn và cảm nhận thực tế không gian lớp học, Chị có thể ghé T.A Academy tại số 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Đà Nẵng vào cuối tuần này được không ạ? 🌸";
+    return "Dạ chi phí bên em chỉ từ 3tr chị đã có thể tham gia khóa học. Chị tiện ghé trung tâm tầm 10 phút để cô test kỹ năng và tư vấn lộ trình học phù hợp của chị luôn không ạ? Hoặc chị dành cho em 3 phút cũng được, em giải thích lộ trình học rồi em gửi bảng giá cụ thể cho chị luôn nha 🌸";
   }
 
-  // 2. Khách hỏi địa chỉ hoặc hotline
-  if (
-    msgLower.includes("địa chỉ") ||
-    msgLower.includes("ở đâu") ||
-    msgLower.includes("hotline") ||
-    msgLower.includes("số điện thoại trung tâm") ||
-    msgLower.includes("trung tâm ở đâu")
-  ) {
-    return "Dạ Học viện T.A Academy có địa chỉ tại: 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Thành phố Đà Nẵng. Hotline hỗ trợ trực tiếp là: 0933.003.995 ạ! Chị muốn ghé trải nghiệm lớp học vào sáng Thứ 7 hay chiều Chủ Nhật tuần này để em chuẩn bị đón tiếp Chị chu đáo nha! ✨";
-  }
-
-  // 3. Khách hỏi học phí trực tiếp (Báo gói thấp nhất theo quy tắc SOP)
+  // 2. Khách hỏi học phí Phong thái
   if (
     msgLower.includes("học phí") ||
     msgLower.includes("bao nhiêu tiền") ||
     msgLower.includes("giá") ||
     msgLower.includes("chi phí")
   ) {
-    return "Dạ em chào Chị ạ! Hiện tại gói học phí thấp nhất tại T.A Academy là 3.080.000 VNĐ cho Lộ trình 8 buổi (gồm giải phóng hình thể, chỉnh dáng đi và thực hành tương tác tại TTTM Indochina Mall Đà Nẵng). Để em tư vấn lộ trình chi tiết và hiệu quả nhất, Chị đang muốn học cho bản thân hay đăng ký cho bé nhà mình vậy ạ? ✨";
+    return "Dạ chi phí bên em chỉ từ 3tr chị đã có thể tham gia khóa học (Lộ trình 1+2: 8 buổi 3.080.000đ; Lộ trình 1+2+3: 14 buổi 5.250.000đ; Lộ trình toàn diện 18 buổi 6.480.000đ). Chị tiện ghé trung tâm tầm 10 phút tại số 74 Bạch Đằng, Đà Nẵng để cô test kỹ năng và tư vấn lộ trình học phù hợp của chị luôn không ạ? Hoặc chị dành cho em 3 phút cũng được, em giải thích lộ trình rồi gửi bảng giá cụ thể cho chị luôn nha ✨";
   }
 
-  // 4. Khách hỏi các giai đoạn hoặc nội dung lộ trình
+  // 3. Khách hỏi địa chỉ hoặc hotline
+  if (msgLower.includes("địa chỉ") || msgLower.includes("ở đâu") || msgLower.includes("hotline")) {
+    return "Dạ Học viện T.A Academy có địa chỉ tại: 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Thành phố Đà Nẵng. Hotline hỗ trợ trực tiếp là: 0933.003.995 ạ! Chị tiện ghé trung tâm tầm 10 phút để cô test kỹ năng và tư vấn lộ trình cho Chị nha! ✨";
+  }
+
+  // 4. Khách nói mục tiêu Phong thái (dáng đi / thương hiệu / tự tin)
   if (
-    msgLower.includes("giai đoạn") ||
-    msgLower.includes("lộ trình") ||
-    msgLower.includes("học những gì") ||
-    msgLower.includes("nội dung")
-  ) {
-    return "Dạ khóa Phong thái tại T.A Academy được thiết kế bài bản qua 4 giai đoạn: GĐ 1 làm quen & tự tin giới thiệu bản thân trước đám đông; GĐ 2 giải phóng hình thể, chỉnh dáng lưng gù, chân vòng kiềng, đi giày cao gót và thực hành tại Indochina Mall; GĐ 3 phát triển nội lực và thần thái ánh mắt; GĐ 4 kỹ năng chụp - chỉnh ảnh và quay video xịn trên điện thoại ạ. Chị muốn ưu tiên chỉnh dáng đi hay nâng tầm thần thái giao tiếp trước ạ?";
-  }
-
-  // 5. Khách hỏi về chỉnh dáng đi gù, nhút nhát, chân vòng kiềng
-  if (
-    msgLower.includes("gù") ||
-    msgLower.includes("nhút nhát") ||
-    msgLower.includes("rụt rè") ||
-    msgLower.includes("vòng kiềng")
-  ) {
-    return "Dạ đây chính là điểm mạnh vượt trội tại T.A Academy ạ! Ở Giai đoạn 2 của khóa học, giảng viên sẽ kèm cặp các bài tập chuyên sâu để sửa lưng gù, cổ và chân vòng kiềng, giúp cơ thể uyển chuyển và tự tin trước đám đông. Không biết Chị đang tìm hiểu lớp cho bản thân hay cho bé nhà mình vậy ạ? 😊";
-  }
-
-  // 6. Khách cung cấp số điện thoại (Bước 4 thành công)
-  const phonePattern = /(0[3|5|7|8|9])+([0-9]{8})\b/;
-  if (phonePattern.test(userMessage)) {
-    return "Dạ em Tiểu Mỹ đã ghi nhận số điện thoại của Chị rồi ạ! Chuyên viên tư vấn của T.A Academy sẽ liên hệ ngay để hỗ trợ chi tiết lịch học và ưu đãi cho Chị nha. Em cảm ơn Chị rất nhiều ạ! ✨";
-  }
-
-  // 7. Khách trả lời mong muốn ở Bước 1 -> AI chuyển sang Bước 2 (Gửi lộ trình)
-  if (
-    msgLower.includes("bản thân") ||
-    msgLower.includes("cho bé") ||
-    msgLower.includes("bán hàng") ||
+    msgLower.includes("tư thế") ||
+    msgLower.includes("dáng đi") ||
     msgLower.includes("thương hiệu") ||
-    msgLower.includes("tương tác") ||
-    msgLower.includes("tự tin")
+    msgLower.includes("bản thân") ||
+    msgLower.includes("giao tiếp")
   ) {
-    return `Dạ với mục tiêu của Chị, em xin gửi Chị Lộ trình phù hợp nhất tại T.A Academy: Lộ trình 8 buổi (3.080.000đ) tập trung chỉnh dáng đi và giải phóng hình thể; Lộ trình 14 buổi (5.250.000đ) rèn luyện thêm nội lực và biểu cảm ánh mắt; Lộ trình toàn diện 18 buổi (6.480.000đ) trang bị trọn bộ cả kỹ năng quay - chụp - chỉnh ảnh xịn. Em gửi Chị xem feedback và video thực tế của học viên lớp trước nha? ✨`;
+    return "Dạ vậy thì khóa học Phong thái là phù hợp với chị lắm đó! Khóa này best seller bên em vì hầu như tất cả chị em bây giờ ai cũng học khóa này để nâng cấp hình ảnh bản thân và sự tự tin chị ạ. Khóa 18 buổi là lộ trình trọn vẹn và giúp chị thay đổi bản thân 1 cách ngoạn mục, chị rảnh tầm 3 phút không? Em gọi chị giải thích rõ về lộ trình 18 buổi nha, Chị cho em xin SĐT của chị ạ! 💖";
   }
 
-  // Mặc định thực hiện chuẩn Bước 1 của Quy trình tư vấn Fanpage
-  return "Chào anh/chị! Em là Tiểu Mỹ của Học viện T.A Academy. Anh/chị đang mong muốn điều gì để em tư vấn phù hợp ạ: tăng tương tác, tăng bán hàng hay xây dựng thương hiệu cá nhân? Và anh/chị đăng ký cho bản thân hay cho bé nhà mình ạ? 🌸";
+  // Mặc định câu chào Phong thái Bước 1
+  return "Em chào chị…, Mục tiêu mong muốn cải thiện bản thân của chị như thế nào ạ? 👉 Cải thiện tư thế, dáng đi 👉 Hay muốn thay đổi bản thân tự tin hơn và xây dựng thương hiệu cá nhân ạ? Bên em có 2 khóa học cho người lớn (Phong thái - Catwalk), nên chị cứ thẳng thắn nói mong muốn nha 😊";
 }
