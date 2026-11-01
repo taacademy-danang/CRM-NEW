@@ -82,6 +82,19 @@ export interface SituationRule {
   isApproved: boolean;
 }
 
+// CÂU TIN NHẮN MỞ ĐẦU BẮT BUỘC KHI KHÁCH NHẮN CHUNG CHUNG
+export const MANDATORY_INITIAL_GREETING = `Dạ em chào chị iu ạ 🥰.
+
+Hiện tại. Bên em có : 
+- Khoá học Phong Thái 
+- Khoá đào tạo Model Kids
+- Khoá học Catwalk
+- Khoá học Diễn xuất làm video ngắn, reels
+- Khoá học Tạo Dáng Chụp Ảnh
+- Khoá học Xây dựng thương hiệu cá nhân
+
+Không biết mình đang tham khảo khóa học cho bé hay người lớn vậy ạ? Hiện tại mục tiêu mong muốn của mình là gì để em tư vấn chi tiết khóa học phù hợp cho mình nha`;
+
 // In-memory Database Store
 let aiConfigStore: AiConfigData = {
   apiKey: process.env.GEMINI_API_KEY || "AIzaSyB_dummy_production_gemini_key_for_ta_academy",
@@ -121,7 +134,21 @@ THÔNG TIN TRUNG TÂM:
 - Tên công ty: T.A Academy – Học viện đào tạo phong thái, catwalk
 - Hotline: 0933.003.995
 - Địa chỉ: 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Thành phố Đà Nẵng
-- Các khóa học: Model Kids (trẻ từ 3, 4 tuổi trở lên); Phong thái; Catwalk; Xây dựng thương hiệu cá nhân; Reels, video ngắn.
+- Các khóa học: Khoá học Phong Thái; Khoá đào tạo Model Kids; Khoá học Catwalk; Khoá học Diễn xuất làm video ngắn, reels; Khoá học Tạo Dáng Chụp Ảnh; Khoá học Xây dựng thương hiệu cá nhân.
+
+QUY TẮC MỞ ĐẦU BẮT BUỘC:
+Nếu khách hàng bắt đầu bằng những câu tin nhắn không rõ tư vấn khóa học cho người lớn hay trẻ em như Hi, Hello, Tư vấn cho tôi, Chào shop, Alo, Inbox, Tư vấn giúp mình,... thì BẮT BUỘC phải trả lời bằng đúng tin nhắn sau:
+"Dạ em chào chị iu ạ 🥰.
+
+Hiện tại. Bên em có : 
+- Khoá học Phong Thái 
+- Khoá đào tạo Model Kids
+- Khoá học Catwalk
+- Khoá học Diễn xuất làm video ngắn, reels
+- Khoá học Tạo Dáng Chụp Ảnh
+- Khoá học Xây dựng thương hiệu cá nhân
+
+Không biết mình đang tham khảo khóa học cho bé hay người lớn vậy ạ? Hiện tại mục tiêu mong muốn của mình là gì để em tư vấn chi tiết khóa học phù hợp cho mình nha"
 
 MỤC TIÊU CUỐI CÙNG:
 1. Xin số điện thoại của khách để nhân viên gọi tư vấn.
@@ -129,17 +156,12 @@ MỤC TIÊU CUỐI CÙNG:
 
 NGUYÊN TẮC CỐT LÕI CỦA T.A ACADEMY:
 1. Làm lần lượt từ Bước 1 đến Bước 5. Mỗi tin nhắn chỉ làm một việc và hỏi một câu để khách dễ trả lời.
-2. Bước 1 BẮT BUỘC xác định khách thuộc khóa nào:
-   - MODEL KIDS: Khách là phụ huynh hỏi cho bé. Hỏi tuổi của bé và gợi ý 3 lựa chọn (Tự tin hơn / Dáng đi - tư thế / Trải nghiệm sân khấu model kids).
-   - PHONG THÁI: Học viên là người lớn (chị em). Khóa best seller. Gợi ý 2 lựa chọn (Cải thiện tư thế, dáng đi / Tự tin & xây dựng thương hiệu cá nhân).
-   - CATWALK: Người lớn (thường chuẩn bị đi thi hoặc làm thương hiệu). Khách xưng "em". HỎI CUỘC THI NÀO VÀ XIN SĐT ĐỂ CÔ TRÂM ANH TRỰC TIẾP TƯ VẤN LỘ TRÌNH VÀ CHI PHÍ HỖ TRỢ ĐI THI.
-3. QUY TẮC BÁO GIÁ:
-   - Model Kids: "Chi phí học bên em chỉ từ 2tr4 chị ạ!" (đã đào tạo hơn 1000 học viên thay đổi ngoạn mục).
-   - Phong thái: "Chi phí bên em chỉ từ 3tr chị đã có thể tham gia khóa học" (Lộ trình 8 buổi 3.080.000đ; 14 buổi 5.250.000đ; 18 buổi 6.480.000đ).
-   - Catwalk: TUYỆT ĐỐI KHÔNG TỰ BÁO LỘ TRÌNH HAY CHI PHÍ. Cô Trâm Anh trực tiếp nói chuyện với học viên.
-4. XỬ LÝ KHÁCH CHƯA CHO SỐ ĐIỆN THOẠI (BƯỚC 5):
-   - Báo chi phí "chỉ từ..." và mời khách ghé trung tâm khoảng 10 phút để test kỹ năng (kiểm tra ưu - nhược điểm để định hình hướng đi tốt hơn).`,
+2. Sau khi xác định được đối tượng:
+   - MODEL KIDS (Phụ huynh hỏi cho bé từ 3, 4 tuổi trở lên): Hỏi tuổi bé và mục tiêu (Tự tin hơn / Cải thiện dáng đi - tư thế / Trải nghiệm sân khấu model kids). Lộ trình 20 buổi. Chi phí chỉ từ 2tr4. Mời test kỹ năng 10 phút.
+   - PHONG THÁI (Người lớn): Khóa best seller. Lộ trình 8-14-18 buổi. Chi phí chỉ từ 3tr. Mời ghé 10 phút test kỹ năng hoặc gọi 3 phút.
+   - CATWALK (Người lớn đi thi / xây dựng thương hiệu): Cô Trâm Anh trực tiếp gọi điện tư vấn lộ trình và chi phí hỗ trợ đi thi. Không tự báo giá hay lộ trình.`,
   rules: [
+    "Khách nhắn tin chung chung (Hi, Hello, Tư vấn cho tôi...) -> BẮT BUỘC gửi tin nhắn danh mục 6 khóa học để hỏi người lớn hay bé.",
     "Làm lần lượt từ Bước 1 đến Bước 5, không nhảy bước. Mỗi tin nhắn chỉ làm 1 việc và hỏi 1 câu.",
     "Model Kids: Bé từ 3, 4 tuổi trở lên (bé 3-4t cần test tiếp thu). Chi phí chỉ từ 2tr4. Mời test kỹ năng 10 phút.",
     "Phong thái: Khóa best seller cho người lớn. Chi phí chỉ từ 3tr (8 buổi 3.080k, 14 buổi 5.250k, 18 buổi 6.480k).",
@@ -148,6 +170,7 @@ NGUYÊN TẮC CỐT LÕI CỦA T.A ACADEMY:
   ],
   forbidden: [
     "Không nhảy bước hoặc gửi dồn dập nhiều câu hỏi/nội dung cùng lúc.",
+    "Không vội vàng tư vấn khóa học cụ thể khi chưa xác định khách học cho người lớn hay trẻ em.",
     "Không tự bịa giá, ưu đãi, kết quả học viên hay tên giáo viên (chỉ duy nhất cô Trâm Anh phụ trách Catwalk).",
     "Không tự ý báo lộ trình và chi phí khóa Catwalk khi chưa có mẫu.",
     "Không ép buộc hay gặng hỏi khi khách chưa muốn cho số điện thoại.",
@@ -160,13 +183,13 @@ let knowledgeDocsStore: KnowledgeDocument[] = [
     id: "doc-kichban-tuvan-chuan-2026",
     title: "[KỊCH BẢN MẪU] Hướng Dẫn Tư Vấn Fanpage Chuẩn 3 Khóa: Model Kids, Phong Thái & Catwalk",
     category: "Model Kids",
-    version: "2.1 (Official)",
+    version: "2.2 (Official)",
     updatedAt: "01/11/2026",
     isApproved: true,
     approvedBy: "Học viện T.A Academy",
-    chunksCount: 30,
+    chunksCount: 32,
     contentSummary:
-      "Kịch bản tư vấn mẫu 5 bước chuẩn hóa T.A Academy cho 3 đối tượng học viên: 1) KHÓA MODEL KIDS: Dành cho bé từ 3, 4 tuổi trở lên (bé 3-4t cần test tiếp thu). Chi phí chỉ từ 2tr4. Đã đào tạo hơn 1000 học viên thay đổi ngoạn mục. Lộ trình 8 buổi cơ bản (mở vai, thẳng lưng, cổ chân khỏe) và 20 buổi trọn gói gần 3 tháng (chỉnh dáng đứng, dáng đi, lưng, vai, thần thái, ngồi đẹp, đánh tay, đi guốc, áo dài, phụ kiện tà/quạt/nón, biểu cảm ống kính). Mời ghé trung tâm 10 phút test kỹ năng xem ưu - nhược điểm của con. 2) KHÓA PHONG THÁI: Khóa Best Seller cho người lớn. Chi phí chỉ từ 3tr (Lộ trình 8 buổi 3.080.000đ, 14 buổi 5.250.000đ, 18 buổi toàn diện 6.480.000đ). Mời ghé 10 phút test kỹ năng hoặc dành 3 phút giải thích lộ trình và gửi bảng giá cụ thể. 3) KHÓA CATWALK: Học viên người lớn chuẩn bị đi thi hoặc xây dựng thương hiệu cá nhân. ĐẶC BIỆT: Cô Trâm Anh trực tiếp nói chuyện với học viên để tư vấn lộ trình và có chính sách chi phí hỗ trợ các bạn đi thi, AI không tự báo giá mà xin SĐT kết nối cô Trâm Anh.",
+      "Kịch bản tư vấn mẫu 5 bước chuẩn hóa T.A Academy cho 3 đối tượng học viên: 0) QUY TẮC MỞ ĐẦU CHUNG: Nếu khách bắt đầu bằng 'Hi', 'Hello', 'Tư vấn cho tôi', 'Chào shop'... mà chưa rõ đối tượng người lớn hay trẻ em, AI bắt buộc gửi tin nhắn danh mục 6 khóa học của T.A Academy (Phong Thái, Model Kids, Catwalk, Video ngắn/reels, Tạo dáng chụp ảnh, Thương hiệu cá nhân) và hỏi rõ học cho bé hay người lớn. 1) KHÓA MODEL KIDS: Dành cho bé từ 3, 4 tuổi trở lên (bé 3-4t cần test tiếp thu). Chi phí chỉ từ 2tr4. Đã đào tạo hơn 1000 học viên thay đổi ngoạn mục. Lộ trình 8 buổi cơ bản và 20 buổi trọn gói gần 3 tháng. Mời ghé trung tâm 10 phút test kỹ năng xem ưu - nhược điểm của con. 2) KHÓA PHONG THÁI: Khóa Best Seller cho người lớn. Chi phí chỉ từ 3tr (Lộ trình 8 buổi 3.080.000đ, 14 buổi 5.250.000đ, 18 buổi toàn diện 6.480.000đ). Mời ghé 10 phút test kỹ năng hoặc dành 3 phút giải thích lộ trình và gửi bảng giá cụ thể. 3) KHÓA CATWALK: Học viên người lớn chuẩn bị đi thi hoặc xây dựng thương hiệu cá nhân. Cô Trâm Anh trực tiếp nói chuyện với học viên để tư vấn lộ trình và có chính sách chi phí hỗ trợ các bạn đi thi, AI không tự báo giá mà xin SĐT kết nối cô Trâm Anh.",
   },
   {
     id: "doc-pt-lotrinh-2026",
@@ -196,6 +219,18 @@ let knowledgeDocsStore: KnowledgeDocument[] = [
 
 // 2. KỊCH BẢN TƯ VẤN CHUẨN MẪU CHO TỪNG ĐỐI TƯỢNG
 let guidedScenariosStore: GuidedScenario[] = [
+  {
+    code: "SCENARIO_OPENING_ROUTING",
+    title: "Kịch Bản Mở Đầu Định Hướng Đối Tượng (Khi Khách Nhắn Chung Chung)",
+    course: "Tất cả các khóa",
+    goal: "Xác định rõ khách hàng tham khảo cho người lớn hay trẻ em trước khi chuyển vào kịch bản chuyên sâu",
+    stepsCount: 2,
+    status: "Đang hoạt động",
+    steps: [
+      "Bước 1: Khách nhắn Hi, Hello, Tư vấn cho tôi... -> AI gửi tin nhắn giới thiệu 6 khóa học (Phong thái, Model Kids, Catwalk, Video ngắn, Tạo dáng chụp ảnh, Thương hiệu cá nhân) và hỏi học cho bé hay người lớn.",
+      "Bước 2: Dựa vào câu trả lời của khách: Nếu bé -> chuyển kịch bản Model Kids; Nếu người lớn nâng tầm -> chuyển kịch bản Phong Thái; Nếu đi thi/thương hiệu -> chuyển kịch bản Catwalk.",
+    ],
+  },
   {
     code: "SCENARIO_MODEL_KIDS",
     title: "Kịch Bản Tư Vấn Khóa Model Kids (Mẫu Nhí 3-4 Tuổi Trở Lên)",
@@ -243,6 +278,15 @@ let guidedScenariosStore: GuidedScenario[] = [
 
 // 3. THƯ VIỆN TÌNH HUỐNG THỰC TẾ
 let situationsStore: SituationRule[] = [
+  {
+    id: "sit-vague-opening-greeting",
+    title: "Khách nhắn tin mở đầu chung chung (Hi, Hello, Tư vấn cho tôi...) chưa rõ người lớn hay trẻ em",
+    category: "Khai thác thông tin",
+    idealResponse: MANDATORY_INITIAL_GREETING,
+    mistakeAvoid:
+      "Tuyệt đối không vội tư vấn khóa học cụ thể khi chưa gửi tin nhắn phân loại danh mục và xác định đối tượng người lớn hay bé.",
+    isApproved: true,
+  },
   {
     id: "sit-model-kids-tuition",
     title: "Phụ huynh hỏi chi phí khóa Model Kids",
@@ -581,6 +625,48 @@ export function simulatePlaygroundReply(params: {
   const { userMessage, scenarioCode = "", course = "" } = params;
   const msgLower = userMessage.toLowerCase().trim();
 
+  // Helper chuẩn hóa bỏ dấu để nhận diện chính xác kể cả khi khách gõ không dấu hoặc lỗi mã hóa
+  const removeAccents = (str: string) =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  const msgNorm = removeAccents(msgLower);
+
+  // 0. BẮT BUỘC: XỬ LÝ CÁC CÂU MỞ ĐẦU CHUNG CHUNG (Hi, Hello, Tư vấn cho tôi...)
+  const isVagueGreeting =
+    msgNorm === "hi" ||
+    msgNorm === "hello" ||
+    msgNorm === "chao" ||
+    msgNorm === "chao em" ||
+    msgNorm === "chao ban" ||
+    msgNorm === "chao shop" ||
+    msgNorm === "alo" ||
+    msgNorm === "tu van cho toi" ||
+    msgNorm === "tu van cho minh" ||
+    msgNorm === "tu van giup minh" ||
+    msgNorm === "tu van giup toi" ||
+    msgNorm === "tu van" ||
+    msgNorm === "minh muon tu van" ||
+    msgNorm === "toi muon tu van" ||
+    msgNorm === "can tu van" ||
+    msgNorm === "inbox" ||
+    msgNorm === "inbox minh" ||
+    msgNorm === "cho minh hoi" ||
+    msgNorm === "toi can tu van" ||
+    msgNorm === "tu van giup" ||
+    msgNorm === "." ||
+    (msgNorm.includes("tu van") &&
+      !msgNorm.includes("be") &&
+      !msgNorm.includes("con") &&
+      !msgNorm.includes("tuoi") &&
+      !msgNorm.includes("nguoi lon") &&
+      !msgNorm.includes("phong thai") &&
+      !msgNorm.includes("catwalk") &&
+      !msgNorm.includes("kids"));
+
+  if (isVagueGreeting) {
+    return MANDATORY_INITIAL_GREETING;
+  }
+
   // A. NHÁNH KHÓA CATWALK (CHUYỂN CÔ TRÂM ANH)
   if (
     scenarioCode === "SCENARIO_CATWALK" ||
@@ -601,6 +687,8 @@ export function simulatePlaygroundReply(params: {
   if (
     scenarioCode === "SCENARIO_MODEL_KIDS" ||
     course.toLowerCase().includes("kids") ||
+    msgLower.includes("cho bé") ||
+    msgLower.includes("trẻ em") ||
     msgLower.includes("bé") ||
     msgLower.includes("con") ||
     msgLower.includes("tuổi") ||
@@ -613,7 +701,7 @@ export function simulatePlaygroundReply(params: {
 
     // 2. Phụ huynh hỏi bé 3-4 tuổi
     if (msgLower.includes("3 tuổi") || msgLower.includes("4 tuổi")) {
-      return "Dạ đối với các bé 3, 4 tuổi bên em nhận đào tạo từ lứa tuổi này rồi chị ạ! Tuy nhiên ở độ tuổi này bé cần ghé trung tâm test kỹ năng một chút để các cô kiểm tra khả năng tiếp thu và tập trung của con. Buổi test tầm 10 phút này rất TỐT, sẽ giúp chị hiểu được con đang có những ưu - nhược điểm gì, từ đó chị sẽ tự định hình được hướng đi tốt hơn cho con nha Chị! Chiều nay chị và bé tiện ghé trung tâm bên em ở 74 Bạch Đằng không ạ? 😊";
+      return "Dạ đối với các bé 3, 4 tuổi bên em nhận đào tạo từ lứa tuổi này rồi chị ạ! Tuy nhiên ở độ tuổi này bé cần ghé trung tâm test kỹ năng một chút để các cô kiểm tra khả năng tiếp thu và tập trung của con. Buổi test tầm 10 phút này rất TỐT, sẽ giúp chị hiểu được con đang có những ưu - nhược điểm gì, từ đó chị tự định hình được hướng đi tốt hơn cho con nha Chị! Chiều nay chị và bé tiện ghé trung tâm bên em ở 74 Bạch Đằng không ạ? 😊";
     }
 
     // 3. Phụ huynh từ chối cho SĐT
@@ -656,8 +744,9 @@ export function simulatePlaygroundReply(params: {
     return "Dạ Học viện T.A Academy có địa chỉ tại: 74 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu, Thành phố Đà Nẵng. Hotline hỗ trợ trực tiếp là: 0933.003.995 ạ! Chị tiện ghé trung tâm tầm 10 phút để cô test kỹ năng và tư vấn lộ trình cho Chị nha! ✨";
   }
 
-  // 4. Khách nói mục tiêu Phong thái (dáng đi / thương hiệu / tự tin)
+  // 4. Khách nói mục tiêu Phong thái (dáng đi / thương hiệu / tự tin / người lớn)
   if (
+    msgLower.includes("người lớn") ||
     msgLower.includes("tư thế") ||
     msgLower.includes("dáng đi") ||
     msgLower.includes("thương hiệu") ||
@@ -667,6 +756,6 @@ export function simulatePlaygroundReply(params: {
     return "Dạ vậy thì khóa học Phong thái là phù hợp với chị lắm đó! Khóa này best seller bên em vì hầu như tất cả chị em bây giờ ai cũng học khóa này để nâng cấp hình ảnh bản thân và sự tự tin chị ạ. Khóa 18 buổi là lộ trình trọn vẹn và giúp chị thay đổi bản thân 1 cách ngoạn mục, chị rảnh tầm 3 phút không? Em gọi chị giải thích rõ về lộ trình 18 buổi nha, Chị cho em xin SĐT của chị ạ! 💖";
   }
 
-  // Mặc định câu chào Phong thái Bước 1
-  return "Em chào chị…, Mục tiêu mong muốn cải thiện bản thân của chị như thế nào ạ? 👉 Cải thiện tư thế, dáng đi 👉 Hay muốn thay đổi bản thân tự tin hơn và xây dựng thương hiệu cá nhân ạ? Bên em có 2 khóa học cho người lớn (Phong thái - Catwalk), nên chị cứ thẳng thắn nói mong muốn nha 😊";
+  // Mặc định phản hồi tin nhắn mở đầu phân loại
+  return MANDATORY_INITIAL_GREETING;
 }

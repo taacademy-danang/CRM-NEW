@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
 
     const reply = simulatePlaygroundReply({
       userMessage,
-      scenarioCode: scenarioCode || "SCENARIO_MODEL_KIDS",
-      course: course || "Model Kids Nâng Cao",
+      scenarioCode: scenarioCode || undefined,
+      course: course || undefined,
     });
 
     return NextResponse.json({

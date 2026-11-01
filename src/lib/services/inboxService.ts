@@ -5,7 +5,7 @@
 
 import { AiConversationMode, ChannelType, Message, MessageSenderType } from "@/types/inbox";
 import { addConsultation, updateConsultationStatus } from "./consultationService";
-import { getAiConfig } from "./aiTrainingService";
+import { getAiConfig, simulatePlaygroundReply } from "./aiTrainingService";
 import { upsertConversationToSupabase, insertMessageToSupabase } from "@/lib/supabase/db";
 
 export interface ConversationItem {
@@ -488,18 +488,10 @@ export function generateAiResponse(conversationId: string, isCopilot = false) {
       ?.filter((m) => m.sender_type === "customer")
       .slice(-1)[0]?.content || "";
 
-  let replyText = "";
-  const lowerMsg = lastCustomerMessage.toLowerCase();
-
-  if (lowerMsg.includes("học thử") || lowerMsg.includes("lịch học")) {
-    replyText = `Dạ em Tiểu Mỹ xin gửi Mẹ lịch học thử trải nghiệm miễn phí khóa ${conversation.course} vào Thứ 7 (09:00 - 10:30) hoặc Chủ Nhật (15:00 - 16:30) tuần này ạ. Mẹ đăng ký ca nào để em giữ chỗ và chuẩn bị giáo cụ tốt nhất cho con nhé? ✨`;
-  } else if (lowerMsg.includes("học phí") || lowerMsg.includes("bao nhiêu")) {
-    replyText = `Dạ khóa ${conversation.course} tại T.A Academy có học phí niêm yết là 6.800.000 VNĐ cho lộ trình 12 buổi kèm cặp chuyên sâu cùng các chuyên gia hàng đầu. Đặc biệt trong tuần này học viện có ưu đãi đặc quyền tặng kèm 1 buổi chụp hình profile chuyên nghiệp cho bé. Mẹ cho em xin số điện thoại để em gửi ưu đãi cho con nha Mẹ! 🌸`;
-  } else if (lowerMsg.includes("gù") || lowerMsg.includes("nhút nhát")) {
-    replyText = `Dạ Mẹ hoàn toàn yên tâm nha! Đây là trăn trở của rất nhiều phụ huynh khi mới đưa con đến T.A Academy. Giáo trình khóa ${conversation.course} được thiết kế với các bài tập chỉnh dáng đi, giải phóng hình thể nhẹ nhàng để con tự tin mở lòng hơn qua từng buổi học mà không có bất kỳ áp lực nào ạ. Em mời Mẹ cho bé ghé học thử một buổi nhé ạ!`;
-  } else {
-    replyText = `Dạ em Tiểu Mỹ xin chào Chị ạ! Rất vui được đồng hành cùng Chị. Với khóa ${conversation.course}, giảng viên tại T.A Academy sẽ kèm cặp sát sao để con rèn luyện phong thái và dáng đi chuẩn nhất. Chị cho em xin thêm thông tin về độ tuổi của bé hoặc số điện thoại để em hỗ trợ tư vấn chi tiết cho mình nha! ✨`;
-  }
+  const replyText = simulatePlaygroundReply({
+    userMessage: lastCustomerMessage,
+    course: conversation.course,
+  });
 
   if (isCopilot) {
     return {
