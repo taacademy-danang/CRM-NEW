@@ -395,6 +395,43 @@ let situationsStore: SituationRule[] = [
     mistakeAvoid: "Không gặng hỏi ép buộc lấy SĐT nhiều lần liên tiếp làm khách khó chịu.",
     isApproved: true,
   },
+  {
+    id: "sit-general-pricing",
+    title: "Khách hỏi chi phí / học phí chung chung ('tư vấn chi phí', 'học phí bao nhiêu')",
+    category: "Xử lý học phí",
+    idealResponse:
+      "Dạ em chào chị ạ! Chi phí các khóa học tại T.A Academy rất linh hoạt và tối ưu, chỉ từ 2tr4 (đối với lớp Model Kids cho bé) và chỉ từ 3tr (đối với khóa Phong Thái người lớn) chị nha 🥰.\n\nTại T.A Academy, toàn bộ lộ trình được thiết kế bài bản với đội ngũ giảng viên siêu mẫu giàu kinh nghiệm trực tiếp kèm cặp, chỉnh sửa tỉ mỉ từng dáng đi, giải phóng hình thể và giúp học viên tự tin tỏa sáng. Học viện đã đồng hành cùng hơn 1.000 học viên thay đổi ngoạn mục về phong thái và vóc dáng ạ!\n\nKhông biết mình đang quan tâm khóa học cho bé hay cho bản thân để em tư vấn lộ trình và mức chi phí tối ưu nhất cho mình nha chị? ✨",
+    mistakeAvoid:
+      "Tuyệt đối không gửi tin nhắn giới thiệu danh mục 6 khóa học khi khách đang hỏi về chi phí. Phải báo giá 'chỉ từ 2tr4 và chỉ từ 3tr' kèm thuyết phục trước.",
+    isApproved: true,
+  },
+  {
+    id: "sit-acting-reels-pricing",
+    title: "Khách hỏi chi phí khóa Diễn xuất làm video ngắn & Reels",
+    category: "Xử lý học phí",
+    idealResponse:
+      "Dạ em chào chị ạ! Chi phí khóa Diễn xuất làm video ngắn & Reels bên em chỉ từ 2tr5 thôi ạ ✨.\n\nKhóa học trang bị cho mình kỹ năng giải phóng hình thể, biểu cảm gương mặt tự nhiên trước ống kính máy quay, cách tương tác và truyền tải cảm xúc cuốn hút người xem. Chị sẽ không còn cảm giác gượng gạo hay đơ cứng khi quay video, tự tin sáng tạo nội dung và xây kênh thương hiệu cá nhân triệu view ạ!\n\nChị có tiện cho em xin SĐT hoặc ghé 74 Bạch Đằng để em tư vấn giáo án thực chiến phù hợp với định hướng kênh của mình nha chị iu! 🥰",
+    mistakeAvoid: "Không nói chung chung, phải báo giá 'chỉ từ 2tr5' và nêu bật kỹ năng diễn xuất tự nhiên trước ống kính.",
+    isApproved: true,
+  },
+  {
+    id: "sit-posing-photo-pricing",
+    title: "Khách hỏi chi phí khóa Tạo dáng chụp ảnh",
+    category: "Xử lý học phí",
+    idealResponse:
+      "Dạ em chào chị ạ! Chi phí khóa Tạo dáng chụp ảnh tại T.A Academy chỉ từ 1tr8 chị nha 🌸.\n\nChị sẽ được các chuyên gia và siêu mẫu hướng dẫn chi tiết các góc mặt đẹp nhất của mình, cách tạo dáng thanh lịch tôn đường cong cơ thể, giải phóng tay chân và biểu cảm thần thái cuốn hút trong mọi khung hình. Sau khóa học, chị sẽ hoàn toàn tự tin tỏa sáng trước ống kính, chụp 100 tấm là ưng ý cả 100 luôn ạ!\n\nChị muốn học để tự tin chụp ảnh đời thường, du lịch hay phục vụ công việc vậy ạ để em tư vấn lịch học phù hợp nhất cho chị nha! ✨",
+    mistakeAvoid: "Không báo giá sai lệch, phải nêu giá 'chỉ từ 1tr8' và thuyết phục góc chụp tôn vóc dáng.",
+    isApproved: true,
+  },
+  {
+    id: "sit-personal-branding-pricing",
+    title: "Khách hỏi chi phí khóa Xây dựng thương hiệu cá nhân",
+    category: "Xử lý học phí",
+    idealResponse:
+      "Dạ em chào chị ạ! Khóa học Xây dựng thương hiệu cá nhân tại T.A Academy chi phí chỉ từ 3tr5 chị nhé ✨.\n\nKhóa học giúp chị định vị phong cách cá nhân độc bản, từ phong thái giao tiếp, thần thái xuất hiện đến chiến lược hình ảnh chuyên nghiệp trên mạng xã hội và trong sự nghiệp. Chị sẽ được kèm cặp trực tiếp bởi đội ngũ chuyên gia giàu kinh nghiệm thực chiến giúp nâng tầm giá trị bản thân rõ rệt.\n\nChị đang muốn xây dựng thương hiệu cá nhân trong lĩnh vực nào vậy ạ? Chị cho em xin SĐT để chuyên viên hỗ trợ tư vấn lộ trình chi tiết nhất cho chị nha! 💖",
+    mistakeAvoid: "Không thiếu phần định hình phong cách độc bản và nâng tầm giá trị cá nhân.",
+    isApproved: true,
+  },
 ];
 
 // TỰ ĐỘNG ĐỒNG BỘ LÊN SUPABASE
@@ -693,7 +730,99 @@ export function simulatePlaygroundReply(params: {
 
   const msgNorm = removeAccents(msgLower);
 
-  // 0. BẮT BUỘC: XỬ LÝ CÁC CÂU MỞ ĐẦU CHUNG CHUNG (Hi, Hello, Tư vấn cho tôi...)
+  // 1. ƯU TIÊN HÀNG ĐẦU: KHÁCH HỎI VỀ CHI PHÍ / HỌC PHÍ / GIÁ KHÓA HỌC
+  const isAskingPrice =
+    msgNorm.includes("chi phi") ||
+    msgNorm.includes("hoc phi") ||
+    msgNorm.includes("gia") ||
+    msgNorm.includes("bao nhieu") ||
+    msgNorm.includes("tien") ||
+    msgNorm.includes("bang gia") ||
+    msgNorm.includes("goi hoc") ||
+    msgNorm.includes("khoan phi") ||
+    msgNorm.includes("ton kem") ||
+    msgNorm.includes("dat khong") ||
+    msgNorm.includes("mac khong");
+
+  if (isAskingPrice) {
+    // 1.1. Khách hỏi chi phí Catwalk (hoặc đi thi / người mẫu / hoa hậu)
+    if (
+      scenarioCode === "SCENARIO_CATWALK" ||
+      course.toLowerCase().includes("catwalk") ||
+      msgNorm.includes("catwalk") ||
+      msgNorm.includes("di thi") ||
+      msgNorm.includes("hoa hau") ||
+      msgNorm.includes("hoa khoi") ||
+      msgNorm.includes("nguoi mau")
+    ) {
+      return "Dạ chào em! Với khóa Catwalk chuyên nghiệp, đặc biệt là các bạn học để đi thi hoặc xây dựng thương hiệu cá nhân, cô Trâm Anh sẽ trực tiếp đánh giá và có chính sách chi phí hỗ trợ đặc quyền cho từng bạn học viên em nha ✨.\n\nCác bạn học viên Catwalk tại học viện đều được kèm cặp trực tiếp bởi Siêu mẫu có chuyên môn sư phạm cao, được uốn nắn từng bước đi, định hình phong cách trình diễn sắc bén và tự tin chinh phục mọi góc máy cũng như sàn diễn lớn.\n\nEm chuẩn bị tham gia cuộc thi nào vậy nè? Em cho chị xin SĐT để chị kết nối cô Trâm Anh trực tiếp trao đổi và hỗ trợ chi phí tốt nhất cho em nhé! 💖";
+    }
+
+    // 1.2. Khách hỏi chi phí Diễn xuất làm video ngắn, reels
+    if (
+      msgNorm.includes("dien xuat") ||
+      msgNorm.includes("reels") ||
+      msgNorm.includes("video") ||
+      msgNorm.includes("tiktok") ||
+      course.toLowerCase().includes("diễn xuất")
+    ) {
+      return "Dạ em chào chị ạ! Chi phí khóa Diễn xuất làm video ngắn & Reels bên em chỉ từ 2tr5 thôi ạ ✨.\n\nKhóa học trang bị cho mình kỹ năng giải phóng hình thể, biểu cảm gương mặt tự nhiên trước ống kính máy quay, cách tương tác và truyền tải cảm xúc cuốn hút người xem. Chị sẽ không còn cảm giác gượng gạo hay đơ cứng khi quay video, tự tin sáng tạo nội dung và xây kênh thương hiệu cá nhân triệu view ạ!\n\nChị có tiện cho em xin SĐT hoặc ghé 74 Bạch Đằng để em tư vấn giáo án thực chiến phù hợp với định hướng kênh của mình nha chị iu! 🥰";
+    }
+
+    // 1.3. Khách hỏi chi phí Tạo dáng chụp ảnh
+    if (
+      msgNorm.includes("tao dang") ||
+      msgNorm.includes("chup anh") ||
+      course.toLowerCase().includes("tạo dáng")
+    ) {
+      return "Dạ em chào chị ạ! Chi phí khóa Tạo dáng chụp ảnh tại T.A Academy chỉ từ 1tr8 chị nha 🌸.\n\nChị sẽ được các chuyên gia và siêu mẫu hướng dẫn chi tiết các góc mặt đẹp nhất của mình, cách tạo dáng thanh lịch tôn đường cong cơ thể, giải phóng tay chân và biểu cảm thần thái cuốn hút trong mọi khung hình. Sau khóa học, chị sẽ hoàn toàn tự tin tỏa sáng trước ống kính, chụp 100 tấm là ưng ý cả 100 luôn ạ!\n\nChị muốn học để tự tin chụp ảnh đời thường, du lịch hay phục vụ công việc vậy ạ để em tư vấn lịch học phù hợp nhất cho chị nha! ✨";
+    }
+
+    // 1.4. Khách hỏi chi phí Xây dựng thương hiệu cá nhân
+    if (
+      msgNorm.includes("thuong hieu") ||
+      msgNorm.includes("nhan hieu") ||
+      course.toLowerCase().includes("thương hiệu")
+    ) {
+      return "Dạ em chào chị ạ! Khóa học Xây dựng thương hiệu cá nhân tại T.A Academy chi phí chỉ từ 3tr5 chị nhé ✨.\n\nKhóa học giúp chị định vị phong cách cá nhân độc bản, từ phong thái giao tiếp, thần thái xuất hiện đến chiến lược hình ảnh chuyên nghiệp trên mạng xã hội và trong sự nghiệp. Chị sẽ được kèm cặp trực tiếp bởi đội ngũ chuyên gia giàu kinh nghiệm thực chiến giúp nâng tầm giá trị bản thân rõ rệt.\n\nChị đang muốn xây dựng thương hiệu cá nhân trong lĩnh vực nào vậy ạ? Chị cho em xin SĐT để chuyên viên hỗ trợ tư vấn lộ trình chi tiết nhất cho chị nha! 💖";
+    }
+
+    // 1.5. Khách hỏi chi phí Model Kids (cho bé / trẻ em / mẫu nhí)
+    const isModelKidsQuery =
+      msgNorm.includes("kids") ||
+      msgNorm.includes("model") ||
+      msgNorm.includes("cho be") ||
+      msgNorm.includes("tre em") ||
+      msgNorm.includes("con") ||
+      msgNorm.includes("tuoi") ||
+      msgNorm.includes("mau nhi") ||
+      (course.toLowerCase().includes("kids") && !msgNorm.includes("nguoi lon") && !msgNorm.includes("phong thai")) ||
+      (scenarioCode === "SCENARIO_MODEL_KIDS" && !msgNorm.includes("nguoi lon") && !msgNorm.includes("phong thai"));
+
+    if (isModelKidsQuery) {
+      return "Dạ em chào chị ạ! Chi phí khóa Model Kids tại T.A Academy chỉ từ 2tr4 chị nha 🥰.\n\nKhóa học này bên em đã đào tạo hơn 1.000 học viên thay đổi ngoạn mục. Các bé không chỉ trở nên tự tin, dạn dĩ trước đám đông mà còn được các chuyên gia chỉnh sửa dáng đi, khắc phục lưng gù, vai lệch và chân vòng kiềng từ sớm trong giai đoạn phát triển vàng. Đặc biệt, bé còn được tham gia các thử thách sân khấu thời trang thực tế để bộc lộ cá tính của mình ạ!\n\nChiều nay hoặc cuối tuần này chị và bé có tiện ghé trung tâm em ở 74 Bạch Đằng tầm 10 phút để cô test kỹ năng xem ưu - nhược điểm của con hoàn toàn miễn phí không ạ? Buổi test này rất bổ ích để chị định hình hướng đi phù hợp nhất cho bé nha chị! 💖";
+    }
+
+    // 1.6. Khách hỏi chi phí Phong Thái (người lớn / bản thân / quý cô / doanh nhân)
+    const isPhongThaiQuery =
+      msgNorm.includes("phong thai") ||
+      msgNorm.includes("nguoi lon") ||
+      msgNorm.includes("ban than") ||
+      msgNorm.includes("chi em") ||
+      msgNorm.includes("quy co") ||
+      msgNorm.includes("doanh nhan") ||
+      (course.toLowerCase().includes("phong thái") && !msgNorm.includes("be") && !msgNorm.includes("kids")) ||
+      (scenarioCode === "SCENARIO_PHONG_THAI" && !msgNorm.includes("be") && !msgNorm.includes("kids"));
+
+    if (isPhongThaiQuery) {
+      return "Dạ em chào chị ạ! Chi phí khóa học Phong Thái bên em chỉ từ 3tr (Lộ trình 8 buổi nền tảng là 3.080.000đ; 14 buổi là 5.250.000đ; 18 buổi toàn diện là 6.480.000đ) là chị đã có thể bắt đầu hành trình nâng tầm bản thân rồi ạ ✨.\n\nĐây là khóa học best seller tại T.A Academy được đông đảo chị em lựa chọn. Chị sẽ được giải phóng hình thể mềm mại, rèn luyện dáng đứng – dáng ngồi sang trọng, bước đi thanh lịch chuẩn phong thái quý cô và tự tin làm chủ ngôn ngữ cơ thể. Đặc biệt, học viên còn có buổi thực hành tương tác thực tế tại TTTM Indochina Mall Đà Nẵng để hoàn thiện thần thái trước đám đông ạ!\n\nChị có tiện ghé trung tâm em tại 74 Bạch Đằng tầm 10 phút để cô test kỹ năng và tư vấn lộ trình tối ưu nhất cho chị, hoặc cho em xin SĐT để giải thích rõ lộ trình phù hợp với chị nha! 🌸";
+    }
+
+    // 1.7. Khách hỏi chi phí chung chung ("tư vấn chi phí", "chi phí bao nhiêu", "học phí thế nào", "bảng giá"...)
+    return "Dạ em chào chị ạ! Chi phí các khóa học tại T.A Academy rất linh hoạt và tối ưu, chỉ từ 2tr4 (đối với lớp Model Kids cho bé) và chỉ từ 3tr (đối với khóa Phong Thái người lớn) chị nha 🥰.\n\nTại T.A Academy, toàn bộ lộ trình được thiết kế bài bản với đội ngũ giảng viên siêu mẫu giàu kinh nghiệm trực tiếp kèm cặp, chỉnh sửa tỉ mỉ từng dáng đi, giải phóng hình thể và giúp học viên tự tin tỏa sáng. Học viện đã đồng hành cùng hơn 1.000 học viên thay đổi ngoạn mục về phong thái và vóc dáng ạ!\n\nKhông biết mình đang quan tâm khóa học cho bé hay cho bản thân để em tư vấn lộ trình và mức chi phí tối ưu nhất cho mình nha chị? ✨";
+  }
+
+  // 0. BẮT BUỘC: XỬ LÝ CÁC CÂU MỞ ĐẦU CHUNG CHUNG KHÔNG HỎI GIÁ (Hi, Hello, Tư vấn cho tôi...)
   const isVagueGreeting =
     msgNorm === "hi" ||
     msgNorm === "hello" ||
@@ -715,15 +844,7 @@ export function simulatePlaygroundReply(params: {
     msgNorm === "cho minh hoi" ||
     msgNorm === "toi can tu van" ||
     msgNorm === "tu van giup" ||
-    msgNorm === "." ||
-    (msgNorm.includes("tu van") &&
-      !msgNorm.includes("be") &&
-      !msgNorm.includes("con") &&
-      !msgNorm.includes("tuoi") &&
-      !msgNorm.includes("nguoi lon") &&
-      !msgNorm.includes("phong thai") &&
-      !msgNorm.includes("catwalk") &&
-      !msgNorm.includes("kids"));
+    msgNorm === ".";
 
   if (isVagueGreeting) {
     return MANDATORY_INITIAL_GREETING;

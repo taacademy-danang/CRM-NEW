@@ -18,7 +18,7 @@ interface ScenarioOption {
 export default function AiPlaygroundPage() {
   const [scenariosList, setScenariosList] = useState<ScenarioOption[]>([]);
   const [scenario, setScenario] = useState("");
-  const [course, setCourse] = useState("Model Kids (Mẫu Nhí)");
+  const [course, setCourse] = useState("");
   const [messages, setMessages] = useState<PlaygroundMessage[]>([
     {
       role: "assistant",
@@ -35,20 +35,20 @@ export default function AiPlaygroundPage() {
       .then((json) => {
         if (json.success && Array.isArray(json.data)) {
           setScenariosList(json.data);
-          if (json.data.length > 0) {
-            setScenario(json.data[0].code);
-          }
         }
       })
       .catch(() => {});
   }, []);
 
   const sampleQuestions = [
-    "Bé nhà chị 7 tuổi hơi nhút nhát, lưng đi hơi gù thì học lớp nào?",
+    "Tư vấn chi phí",
     "Học phí khóa Model Kids là bao nhiêu tiền vậy em?",
-    "Học phí bên em cao hơn trung tâm khác nhiều thế?",
-    "Chị chưa muốn cho số điện thoại đâu em ơi",
-    "Bên mình có lớp học thử trải nghiệm cuối tuần không?",
+    "Khóa Phong Thái chi phí bao nhiêu em?",
+    "Học phí khóa Catwalk đi thi thế nào?",
+    "Chi phí khóa Diễn xuất quay reels là bao nhiêu?",
+    "Chi phí khóa Tạo dáng chụp ảnh thế nào em?",
+    "Chi phí khóa Xây dựng thương hiệu cá nhân?",
+    "Hi shop",
   ];
 
   const handleSend = async (messageText?: string) => {
@@ -138,15 +138,12 @@ export default function AiPlaygroundPage() {
               onChange={(e) => setScenario(e.target.value)}
               className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800"
             >
-              {scenariosList.length === 0 ? (
-                <option value="">Chưa có kịch bản (Đào tạo từ đầu)</option>
-              ) : (
-                scenariosList.map((sc) => (
-                  <option key={sc.code} value={sc.code}>
-                    {sc.title}
-                  </option>
-                ))
-              )}
+              <option value="">Tự động nhận diện ngữ cảnh (Linh hoạt)</option>
+              {scenariosList.map((sc) => (
+                <option key={sc.code} value={sc.code}>
+                  {sc.title}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -157,10 +154,14 @@ export default function AiPlaygroundPage() {
               onChange={(e) => setCourse(e.target.value)}
               className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800"
             >
-              <option>Model Kids (Mẫu Nhí Tài Năng)</option>
-              <option>Phong Thái Quý Cô &amp; Doanh Nhân</option>
-              <option>Catwalk Chuyên Nghiệp</option>
-              <option>Nghệ Thuật Giao Tiếp &amp; Thuyết Trình</option>
+              <option value="">Tự động theo câu hỏi khách</option>
+              <option value="Model Kids (Mẫu Nhí Tài Năng)">Model Kids (Mẫu Nhí Tài Năng)</option>
+              <option value="Phong Thái Quý Cô & Doanh Nhân">Phong Thái Quý Cô &amp; Doanh Nhân</option>
+              <option value="Catwalk Chuyên Nghiệp">Catwalk Chuyên Nghiệp</option>
+              <option value="Diễn Xuất Làm Video Ngắn & Reels">Diễn Xuất Làm Video Ngắn &amp; Reels</option>
+              <option value="Tạo Dáng Chụp Ảnh">Tạo Dáng Chụp Ảnh</option>
+              <option value="Xây Dựng Thương Hiệu Cá Nhân">Xây Dựng Thương Hiệu Cá Nhân</option>
+              <option value="Nghệ Thuật Giao Tiếp & Thuyết Trình">Nghệ Thuật Giao Tiếp &amp; Thuyết Trình</option>
             </select>
           </div>
         </div>
